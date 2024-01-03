@@ -55,6 +55,20 @@ def print_size_of_model(path_to_category, path_to_weights, label):
     print(label + str(size/1e6))
 
 def longest_path_down_tree(root):
+    """
+    Get the longest path down the tree
+
+    Parameters
+    ----------
+    root: TreeNode
+        the root node of the tree
+
+    Return
+    ------
+    longest_path: list
+        list containing the node values down the longest path in the tree
+    """
+
     if(not root):
         return []
     longest_path = []
@@ -75,6 +89,20 @@ def longest_path_down_tree(root):
     return longest_path
 
 def shortest_path_down_tree(root):
+    """
+    Get the shortest path down the tree
+
+    Parameters
+    ----------
+    root: TreeNode
+        the root node of the tree
+
+    Return
+    ------
+    shortest_path: list
+        list containing the node values down the shortest path in the tree
+    """
+
     if(not root):
         return []
     shortest_path = None
@@ -95,6 +123,26 @@ def shortest_path_down_tree(root):
     return shortest_path
 
 def update_leaf_names(nodes_dict, inverse_category_encoding, tree_path):
+    """
+    Change the leaf nodes' name from sg{} to the category it is responsible for 
+
+    Parameters
+    ----------
+    nodes_dict: dict
+        dictionary of all the treenodes 
+
+    inverse_category_encoding: dict
+        dictionary mapping the categoryID to the category name
+
+    tree_path: str
+        the path to the saved tree pickle file
+
+    Return
+    ------
+    nodes_dict: dict
+        updated dictionary of all the treenodes
+    """
+
     leaf_name_mapping = map_leaf_name_to_category(tree_path)
     for node_value, node in nodes_dict.items():
         if(node_value in leaf_name_mapping):
@@ -102,6 +150,21 @@ def update_leaf_names(nodes_dict, inverse_category_encoding, tree_path):
     return nodes_dict
 
 def visualize_tree(path_to_outputs, root, graph=None):
+    """
+    Create a png image visualizing the tree
+
+    Parameters
+    ----------
+    path_to_outputs: str
+        the path to save the png image of the tree in its appropriate folder
+
+    root: TreeNode
+        the root of the tree
+
+    graph: graphviz.Digraph [Optional]
+        the graph object used to draw the tree
+    """
+
     if graph is None:
         graph = graphviz.Digraph()
     
@@ -114,6 +177,24 @@ def visualize_tree(path_to_outputs, root, graph=None):
     graph.render(save_path, format='png', cleanup=True)
 
 def num_operations(path_to_category, dataset, dict_inputs, label):
+    """
+    Compute the number of floating point operations and trainable parameters are involved
+    
+    Parameters
+    ----------
+    path_to_category: list
+        list containing the path to either the shortest or longest path
+
+    dataset: GenerateDataset
+        the dataset containing necessary attributes and functions
+
+    dict_inputs: dict
+        dictionary of inputs (image size and number of classes) for each model
+
+    label: str
+        label used for printing
+    """
+
     total_flops, total_params = 0, 0
     for node_value in path_to_category:
         if(isinstance(node_value, str) and ("sg" in node_value or "root" in node_value)):
@@ -130,6 +211,15 @@ def num_operations(path_to_category, dataset, dict_inputs, label):
     print(f"The {label} path in the tree which is {path_to_category[0]} -> {path_to_category[-1]} involves {total_flops} floating point operations and {total_params} trainable parameters")
 
 def untrained_root_asl(dataset):
+    """
+    Get the Average Softmax Likelihood (ASL) of an untrained root node for the CiFAR tree
+
+    Parameters
+    ----------
+    dataset: GenerateDataset
+        the dataset containing necessary attributes and functions
+    """
+
     image_shape = dataset.image_shape
     num_classes = len(dataset.labels)
     model_backbone = dataset.model_backbone
@@ -140,6 +230,15 @@ def untrained_root_asl(dataset):
     AverageSoftmax([model], dataloader, current_supergroup="root", softmax_file_path=path_to_softmax_matrix)
 
 def display_asl_matrix(dataset):
+    """
+    Display the untrained and trained root ASL for CiFAR10 dataset
+
+    Parameters
+    ----------
+    dataset: GenerateDataset
+        the dataset containing necessary attributes and functions
+    """
+
     path_to_untrained_asl = os.path.join(dataset.path_to_outputs, f"model_softmax/untrained_root_avg_softmax.pt")
     untrained_asl = torch.load(path_to_untrained_asl, map_location=torch.device("cpu"))
 
