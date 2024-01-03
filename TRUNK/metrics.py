@@ -7,7 +7,7 @@ import json
 from datasets import GenerateDataset
 from pathDecisions import map_leaf_name_to_category
 from model_by_dataset import get_model
-from grouper import AverageSoftmax
+from grouper import AverageSoftmax, SigmoidMembership
 
 def parser():
     """
@@ -262,6 +262,34 @@ def display_asl_matrix(dataset):
     print("=============")
     print(final_tensor)
 
+def sigmoid_membership(dataset):
+    """
+    Display the sigmoid membership of the trained root node for the dog category in the CIFAR dataset 
+
+    Parameters
+    ----------
+    dataset: GenerateDataset
+        the dataset containing necessary attributes and functions
+    """
+
+    path_to_trained_asl = os.path.join(dataset.path_to_outputs, f"model_softmax/root_avg_softmax.pt")
+    trained_asl = torch.load(path_to_trained_asl, map_location=torch.device("cpu"))
+
+    category_encoding = dataset.get_integer_encoding()
+    dog_idx = category_encoding["dog"]
+    trained_dog_softmax = trained_asl[dog_idx, :]
+
+    hyperparameters = json.load(open(os.path.join(dataset.path_to_outputs, "hyperparameters.json"), "r"))
+    grouping_volatility = hyperparameters["grouping_volatility"]
+    num_classes = len(dataset.labels)
+
+    membership = []
+    for asl in trained_dog_softmax:
+        membership.append(SigmoidMembership(num_classes, grouping_volatility, float(asl)))
+
+    membership = {list(category_encoding.keys())[idx]: membership[idx] for idx in range(len(membership))}
+    print(membership)
+
 if __name__ == "__main__":
     args = parser()
     dataset = GenerateDataset(args.dataset.lower(), args.model_backbone.lower(), train=False)
@@ -287,3 +315,4 @@ if __name__ == "__main__":
     if(args.untrained_asl and args.dataset == "cifar10"):
         untrained_root_asl(dataset)
         display_asl_matrix(dataset)
+        sigmoid_membership(dataset)
