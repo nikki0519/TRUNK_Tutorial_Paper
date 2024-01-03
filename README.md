@@ -11,7 +11,16 @@ This github repository contains all the code used to generate the results mentio
 ## Installation
 The implementations provided in this repository requires a python version 3.9.18, a PyTorch version 1.12 with CUDA 11.3, and other 3rd party packages. To setup the required dependencies to reproduce the results of this repository, follow these instructions
 
+[conda][1] (**Recommended**) - clone the repository and then activate the mnn conda environment using the provided environment definition
 ```bash
 conda env create -f environment.yml
 conda activate mnn
 ```
+
+[pip][2] - clone the repository and then install the dependencies using the provided command
+```bash
+pip install -r requirements.txt
+```
+
+[1]: https://docs.conda.io/projects/conda/en/latest/user-guide/getting-started.html
+[2]: https://pip.pypa.io/en/stable/getting-started/
