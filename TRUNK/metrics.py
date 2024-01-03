@@ -7,6 +7,7 @@ import json
 from datasets import GenerateDataset
 from pathDecisions import map_leaf_name_to_category
 from model_by_dataset import get_model
+from grouper import AverageSoftmax
 
 def parser():
     """
@@ -21,6 +22,7 @@ def parser():
     parser.add_argument("--dataset", type=str, help="emnist, svhn, cifar10", default="emnist")
     parser.add_argument("--model_backbone", type=str, help="vgg or mobilenet", default="mobilenet")
     parser.add_argument("--visualize", action="store_true", help="Save visual of the tree")
+    parser.add_argument("--untrained_asl", action="store_true", help="Get ASL of untrained root")
     args = parser.parse_args()
     return args
 
@@ -127,6 +129,40 @@ def num_operations(path_to_category, dataset, dict_inputs, label):
     
     print(f"The {label} path in the tree which is {path_to_category[0]} -> {path_to_category[-1]} involves {total_flops} floating point operations and {total_params} trainable parameters")
 
+def untrained_root_asl(dataset):
+    image_shape = dataset.image_shape
+    num_classes = len(dataset.labels)
+    model_backbone = dataset.model_backbone
+    dataloader = torch.utils.data.DataLoader(dataset, batch_size=16, num_workers=0, shuffle=True)
+
+    model = get_model(dataloader, model_backbone, num_classes, image_shape, current_supergroup="root", supergroup="root", debug_flag=False)
+    path_to_softmax_matrix = os.path.join(dataset.path_to_outputs, f"model_softmax/untrained_root_avg_softmax.pt")
+    AverageSoftmax([model], dataloader, current_supergroup="root", softmax_file_path=path_to_softmax_matrix)
+
+def display_asl_matrix(dataset):
+    path_to_untrained_asl = os.path.join(dataset.path_to_outputs, f"model_softmax/untrained_root_avg_softmax.pt")
+    untrained_asl = torch.load(path_to_untrained_asl, map_location=torch.device("cpu"))
+
+    path_to_trained_asl = os.path.join(dataset.path_to_outputs, f"model_softmax/root_avg_softmax.pt")
+    trained_asl = torch.load(path_to_trained_asl, map_location=torch.device("cpu"))
+
+    category_encoding = dataset.get_integer_encoding()
+    dog_idx, plane_idx = category_encoding["dog"], category_encoding["airplane"]
+
+    untrained_dog_softmax = untrained_asl[dog_idx, :]
+    trained_dog_softmax = trained_asl[dog_idx, :]
+
+    untrained_plane_softmax = untrained_asl[plane_idx, :]
+    trained_plane_softmax = trained_asl[plane_idx, :]
+
+    assert untrained_dog_softmax.shape == trained_dog_softmax.shape, f"dog: untrained shape {untrained_dog_softmax.shape} != trained shape {trained_dog_softmax.shape}"
+    assert untrained_plane_softmax.shape == trained_plane_softmax.shape, f"plane: untrained shape {untrained_plane_softmax.shape} != trained shape {trained_plane_softmax.shape}"
+
+    final_tensor = torch.stack([untrained_dog_softmax, untrained_plane_softmax, trained_dog_softmax, trained_plane_softmax], dim=0)
+    print(category_encoding)
+    print("=============")
+    print(final_tensor)
+
 if __name__ == "__main__":
     args = parser()
     dataset = GenerateDataset(args.dataset.lower(), args.model_backbone.lower(), train=False)
@@ -148,3 +184,7 @@ if __name__ == "__main__":
     dict_model_inputs = json.load(open(os.path.join(dataset.path_to_outputs, "model_weights/inputs_to_models.json")))
     num_operations(shortest_path, dataset, dict_model_inputs, label="shortest")
     num_operations(longest_path, dataset, dict_model_inputs, label="longest")
+
+    if(args.untrained_asl and args.dataset == "cifar10"):
+        untrained_root_asl(dataset)
+        display_asl_matrix(dataset)
