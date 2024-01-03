@@ -7,3 +7,11 @@ This github repository contains all the code used to generate the results mentio
 - LPCV Background: Contains the code used to introduce LPCV techniques mentioned in the background section of the paper
 - Monolithic Architectures: Contains the code used to compare our TRUNK architecture against well-known monolithic architectures such as ConvNeXt, DinoV2, MobileNetv2, ResNet, ResNet Quantized, ResNet Pruned, VGG, and ViT
 - TRUNK: Contains the code for training and testing our TRUNK, as well as the pre-trained models
+
+## Installation
+The implementations provided in this repository requires a python version 3.9.18, a PyTorch version 1.12 with CUDA 11.3, and other 3rd party packages. To setup the required dependencies to reproduce the results of this repository, follow these instructions
+
+```bash
+conda env create -f environment.yml
+conda activate mnn
+```
