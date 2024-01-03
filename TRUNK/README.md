@@ -17,7 +17,7 @@ $ python main.py --train --dataset emnist --model_backbone mobilenet --num_worke
 $ python main.py --infer --dataset emnist --model_backbone mobilenet --num_workers 2 --debug
 ```
 
-To measure the memory size, number of floating point operations (FLOPs), number of trainable parameters, to visualize the tree for a specific dataset, and to compare the ASL of an untrained root and a trained root node, execute the metrics.py script as follows
+To measure the memory size, number of floating point operations (FLOPs), number of trainable parameters, to visualize the tree for a specific dataset, to compare the ASL of an untrained root and a trained root node, and to get the sigmoid membership for a category from a trained node, execute the metrics.py script as follows
 
 ```bash
 $ python metrics.py --dataset emnist --model_backbone mobilenet --visualize --untrained_asl
