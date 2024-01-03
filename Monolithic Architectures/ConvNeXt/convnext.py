@@ -178,9 +178,9 @@ def get_hyperparameters(dataset):
 
     elif(dataset == "svhn"):
         epochs = 10
-        learning_rate = 1e-2
+        learning_rate = 0.5e-5
         betas = (0.9, 0.99)
-        weight_decay = 0
+        weight_decay = 1e-4
 
     return epochs, learning_rate, betas, weight_decay
 
