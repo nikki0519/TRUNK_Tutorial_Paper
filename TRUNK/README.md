@@ -23,6 +23,5 @@ To measure the memory size, number of floating point operations (FLOPs), number 
 $ python metrics.py --dataset emnist --model_backbone mobilenet --visualize --untrained_asl
 ```
 
-## References
 [1]: https://arxiv.org/pdf/1801.04381.pdf
 [2]: https://arxiv.org/pdf/1409.1556.pdf 
