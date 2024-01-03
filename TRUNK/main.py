@@ -382,9 +382,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-
-    """
-    Notes
-    Train: CUDA_LAUNCH_BLOCKING=1 python main.py --train --dataset emnist --model_backbone mobilenet --num_workers 2 --debug 
-    Test: CUDA_LAUNCH_BLOCKING=1 python main.py --infer --dataset emnist --model_backbone mobilenet --num_workers 2 --debug
-    """
