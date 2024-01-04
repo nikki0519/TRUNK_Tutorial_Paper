@@ -9,7 +9,7 @@ PyTorch code provided to conduct experiments and compare our TRUNK architecture 
 7. [Vision Transformers (ViT)][5]
 8. [DinoV2][6]
 
-To reproduce the comparison results on the EMNIST, CiFAR10, and SVHN datasets, execute the comparisons.py script. The data will be downloaded when this script is executed. 
+To reproduce the comparison results on the EMNIST, CiFAR10, and SVHN datasets, execute the comparisons.py script. The data will be downloaded when this script is executed. Pre-Trained weights are also available in the respective folders.
 
 ```bash
 python comparisons.py --dataset emnist --model resnet
