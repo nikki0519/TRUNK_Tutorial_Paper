@@ -2,6 +2,7 @@
 import torch
 import torch.nn as nn
 from tqdm import tqdm
+from torch.optim import lr_scheduler
 
 ## Global Variables
 device = "cuda" if torch.cuda.is_available() else "cpu"
@@ -10,7 +11,31 @@ device = torch.device(device) # push the device to the gpu if gpu is available o
 
 loss_function = nn.NLLLoss() # loss function used to compute loss during training and validation
 
-def train(list_of_models, current_supergroup, epochs, optimizer, model_save_path, trainloader, validationloader):
+def get_scheduler(scheduler_config, optimizer):
+    """
+    Get the scheduler function based on the config file
+
+    Parameters
+    ----------
+    scheduler_config: dict
+        dictionary containing information on the scheduler
+
+    optimizer: torch.optim.adam.Adam
+        The optimizer used to step down the loss curve
+
+    Return
+    ------
+    scheduler: torch.optim.lr_scheduler
+    """
+
+    scheduler_config = scheduler_config[0]
+    scheduler_type = scheduler_config['type']
+    params = scheduler_config.get('params', {})
+    scheduler_class = getattr(lr_scheduler, scheduler_type)
+    return scheduler_class(optimizer, **params)
+
+
+def train(list_of_models, current_supergroup, epochs, optimizer, scheduler_config, model_save_path, trainloader, validationloader):
     """
     Train the current supergroup module
 
@@ -31,6 +56,9 @@ def train(list_of_models, current_supergroup, epochs, optimizer, model_save_path
     loss_function: func
         Function used to calculate the loss function
 
+    scheduler_config: dict
+        dictionary containing information on the scheduler
+
     model_save_path: str
         the path to save the trained supergroup module
         
@@ -45,7 +73,8 @@ def train(list_of_models, current_supergroup, epochs, optimizer, model_save_path
     feature_map_shape: tuple (BxCxHxW)
         the new shape of the feature map
     """
-    scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(optimizer, T_max=10, eta_min=0)
+    # scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(optimizer, T_max=10, eta_min=0)
+    scheduler = get_scheduler(scheduler_config, optimizer)
     max_validation_accuracy = 0.0 # keep track of the maximum accuracy to know which model to save after conducting validation
     for epoch in range(1, epochs+1):
         count = 0 # Count the number of times we get a true positive result in a batch, used to calculate accuracy

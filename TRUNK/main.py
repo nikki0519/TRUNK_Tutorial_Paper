@@ -322,7 +322,7 @@ def main():
             hyperparameters = config.hyperparameters
             optimizer = torch.optim.Adam(list_of_models[-1].parameters(), lr=hyperparameters['learning_rate'], weight_decay=hyperparameters['weight_decay'])
             path_save_model = os.path.join(trainloader.dataset.path_to_outputs, f"model_weights/{current_supergroup}.pt")
-            image_shape = train(list_of_models=list_of_models, current_supergroup=current_supergroup, epochs=hyperparameters['epochs'], optimizer=optimizer, model_save_path=path_save_model, trainloader=trainloader, validationloader=testloader)
+            image_shape = train(list_of_models=list_of_models, current_supergroup=current_supergroup, epochs=hyperparameters['epochs'], optimizer=optimizer, scheduler_config=hyperparameters['lr_scheduler'], model_save_path=path_save_model, trainloader=trainloader, validationloader=testloader)
             image_shape = tuple(image_shape[1:]) # change from (BxCxHxW) -> (CxHxW)
 
             # Create the average softmax of this current trained supergroup
