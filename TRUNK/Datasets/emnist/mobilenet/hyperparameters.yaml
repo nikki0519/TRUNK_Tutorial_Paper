@@ -20,6 +20,11 @@ dataset:
       shuffle: True
 hyperparameters:
   learning_rate: 0.001
+  lr_scheduler: 
+  - type: CosineAnnealingLR
+    params:
+      T_max: 10
+      eta_min: 0
   weight_decay: 0.0001
   epochs: 5
   grouping_volatility: 1.20
