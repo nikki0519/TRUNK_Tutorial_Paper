@@ -408,7 +408,7 @@ def build_transforms(transform_config):
 		transform_class = getattr(transforms, transform_type)
 		transform_list.append(transform_class(**params))
 
-	return transform_list
+	return transforms.Compose(transform_list)
 
 def load_dataset(dataset, config, train=False):
 	"""
