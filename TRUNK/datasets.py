@@ -405,6 +405,9 @@ def build_transforms(transform_config):
 	for item in transform_config:
 		transform_type = item['type']
 		params = item.get('params', {})
+		if('size' in params and isinstance(params['size'], list)):
+			params['size'] = tuple(params["size"])
+
 		transform_class = getattr(transforms, transform_type)
 		transform_list.append(transform_class(**params))
 
