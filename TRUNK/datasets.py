@@ -1,6 +1,6 @@
 # Import necessary libraries
 from torchvision import datasets
-import torchvision.transforms as tvt
+from torchvision import transforms
 import torch
 import json
 import os
@@ -58,7 +58,7 @@ class GenerateDataset(torch.utils.data.Dataset):
 		get a dictionary of class IDs and their respective labels
 	"""
 
-	def __init__(self, dataset, model_backbone, train=False, re_train=False):
+	def __init__(self, dataset, model_backbone, config, train=False, re_train=False):
 		"""
 		Parameters
 		----------
@@ -67,6 +67,9 @@ class GenerateDataset(torch.utils.data.Dataset):
 
 		model_backbone: str
 			the user's choice of model_backbone (i.e. vgg or mobilenet) inputted as a command line argument
+
+		config: dict
+			dictionary of training regime
 
 		train: bool
 			train is true, if we want to create a training dataset and train is false if we want to create a testing dataset
@@ -77,7 +80,7 @@ class GenerateDataset(torch.utils.data.Dataset):
 
 		self.dataset = dataset # Argument from user: emnist or svhn or cifar10?
 		self.model_backbone = model_backbone # Argument from user: vgg or mobilenet, needed for path
-		self.data = load_dataset(self.dataset, train) # Load the torchvision dataset
+		self.data = load_dataset(self.dataset, config, train) # Load the torchvision dataset
 		self.max_depth = 1 # Current maximum depth of the tree 
 
 		self.image_shape = tuple(self.data[0][0].shape) # Get the shape of the image in the dataset (CxHxW)
@@ -383,7 +386,31 @@ class GenerateDataset(torch.utils.data.Dataset):
 		image, target = self.data[idx][0], self.target_map[str(self.data[idx][1])] # Note: self.data[idx] = (image, classID)
 		return image, target
 
-def load_dataset(dataset, train=False):
+def build_transforms(transform_config):
+	"""
+	Build the list of transforms appropriate to the dataset
+
+	Parameters
+	----------
+	transform_config: dict
+		dictionary of transforms we're using
+
+	Return
+	------
+	transform_list: list
+		list of transforms
+	"""
+
+	transform_list = []
+	for item in transform_config:
+		transform_type = item['type']
+		params = item.get('params', {})
+		transform_class = getattr(transforms, transform_type)
+		transform_list.append(transform_class(**params))
+
+	return transform_list
+
+def load_dataset(dataset, config, train=False):
 	"""
 	Return a torchvision dataset given user input of which dataset they want to conduct image classification for using TRUNK
 
@@ -391,6 +418,9 @@ def load_dataset(dataset, train=False):
 	----------
 	dataset: str
 		the user's choice of dataset (i.e. emnist, svhn, or cifar10) inputted as a command line argument
+
+	config: dict
+		dictionary of training regime
 
 	train: bool
 		train is true, if we want to create a training dataset and train is false if we want to create a testing dataset
@@ -401,12 +431,8 @@ def load_dataset(dataset, train=False):
 		the torchvision dataset that the user wants to train/test on using TRUNK
 	"""
 	
-	transform = [tvt.ToTensor()] # conduct transformation on the image to convert it to a torch.tensor type
-	if(dataset == "svhn"):
-		transform.append(tvt.Normalize(mean=(0.5, 0.5, 0.5), std=(0.5, 0.5, 0.5))) # only the emnist dataset cannot be normalized so we omit this transformation for the emnist dataset
-	elif(dataset == "cifar10"):
-		transform.append(tvt.Normalize(mean=(0.485, 0.456, 0.406), std=(0.229, 0.224, 0.225))) # only the emnist dataset cannot be normalized so we omit this transformation for the emnist dataset
-	transform = tvt.Compose(transform)
+	transform_config = config.dataset.train.transform
+	transform = build_transforms(transform_config)
 	
 	if(train):
 		if(dataset == "emnist"):
@@ -456,8 +482,7 @@ def load_dataset(dataset, train=False):
 									download=True, 
 									transform=transform)
 
-	
-def get_dataloader(dataset, batch_size, num_workers, shuffle):
+def get_dataloader(dataset, config, train=False, validation=False):
 	"""
 	Return an iterable torch dataloader
 
@@ -466,14 +491,14 @@ def get_dataloader(dataset, batch_size, num_workers, shuffle):
 	dataset: torchvision.dataset
 		the torchvision dataset that the user wants to train/test on using TRUNK
 
-	batch_size: int
-		batch size of the dataloader
-	
-	num_workers: int
-		parallel workers for the dataloader
-	
-	shuffle: bool
-		shuffle the dataset in the dataloader
+	config: dict
+		dictionary of training regime
+
+	train: bool [Optional]
+		train is False if we are doing inference else it is True
+
+	validation: bool [Optional]
+		validation is true if training is true and we need a validation dataset
 
 	Return
 	------
@@ -481,7 +506,12 @@ def get_dataloader(dataset, batch_size, num_workers, shuffle):
 		return the iterable dataloader for the custom dataset	
 	"""
 
-	if(len(dataset) % batch_size != 0):
-		return torch.utils.data.DataLoader(dataset, batch_size=batch_size, num_workers=num_workers, shuffle=shuffle, drop_last=True)
-	
-	return torch.utils.data.DataLoader(dataset, batch_size=batch_size, num_workers=num_workers, shuffle=shuffle)
+	if(train):
+		if(validation):
+			dataloader_config = config.dataset.validation.params
+		else:
+			dataloader_config = config.dataset.train.params
+	else:
+		dataloader_config = config.dataset.test.params
+
+	return torch.utils.data.DataLoader(dataset, batch_size=dataloader_config["batch_size"], num_workers=dataloader_config["num_workers"], shuffle=dataloader_config["shuffle"], drop_last=True)

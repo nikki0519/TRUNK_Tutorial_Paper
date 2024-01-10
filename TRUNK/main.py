@@ -10,7 +10,7 @@ from collections import deque
 import torch
 import json
 import time
-from lightning.fabric import Fabric
+from omegaconf import OmegaConf
 
 # Global Variables
 device = "cuda" if torch.cuda.is_available() else "cpu"
@@ -30,23 +30,21 @@ def parser():
     parser.add_argument("--train", action="store_true", help="Conduct training")
     parser.add_argument("--infer", action="store_true", help="Conduct inference")
     parser.add_argument("--improve_model_weights", type=str, help="Improve a certain supergroup's validation accuracy by optimizing its parameters")
-    parser.add_argument("--train_batch_size", type=int, help="Training Batch Size", default=128)
-    parser.add_argument("--eval_batch_size", type=int, help="Evaluation Batch Size", default=128)
-    parser.add_argument("--num_workers", type=int, help="Number of parallel workers for dataloader", default=0)
     parser.add_argument("--dataset", type=str, help="emnist, svhn, cifar10", default="emnist")
     parser.add_argument("--model_backbone", type=str, help="vgg or mobilenet", default="mobilenet")
+    parser.add_argument("--config", type=str, help="Path to config")
     parser.add_argument("--debug", action="store_true", help="Print information for debugging purposes")
     args = parser.parse_args()
     return args
 
-def get_hyperparameters(dataloader):
+def get_hyperparameters(path):
     """
     Get all the hyperparameters required for the dataset we want to train
 
     Parameters
     ----------
-    dataloader: torch.utils.data.DataLoader
-        Iterable dataloader
+    path: str
+        relative path to config file
 
     Return
     ------
@@ -54,9 +52,9 @@ def get_hyperparameters(dataloader):
         dictionary of all the hyperparameters
     """
 
-    path_to_hyperparameters = os.path.join(dataloader.dataset.path_to_outputs, "hyperparameters.json")
-    fptr = open(path_to_hyperparameters, "r")
-    return json.load(fptr)
+    path_to_config = os.path.join(path, "hyperparameters.yaml")
+    config = OmegaConf.load(path_to_config)
+    return config
 
 def get_list_of_models_by_path(dataloader, model_backbone, current_supergroup, dictionary_of_inputs_for_models, debug_flag=False):
     """
@@ -184,7 +182,7 @@ def update_inputs_for_model(nodes_dict, image_shape):
     
     return dictionary_of_inputs_for_models
 
-def improve_modules_accuracy(trainloader, testloader, current_supergroup):
+def improve_modules_accuracy(trainloader, testloader, hyperparameters, current_supergroup):
     """
     Improve the accuracy of the module based on the updated hyper-parameters provided in the json file 
 
@@ -196,6 +194,9 @@ def improve_modules_accuracy(trainloader, testloader, current_supergroup):
     testloader: torch.utils.data.DataLoader
         iterable testing dataset
 
+    hyperparameters: dict
+        dictionary of re-train hyperparameters
+
     current_supergroup: TreeNode
         Re-training the current supergroup to improve the validation accuracy based on the new hyperparameters
     """
@@ -204,14 +205,13 @@ def improve_modules_accuracy(trainloader, testloader, current_supergroup):
 
     nodes_dict = trainloader.dataset.get_dictionary_of_nodes()
     inputs_to_model = update_inputs_for_model(nodes_dict, trainloader.dataset.image_shape)
-    hyperparameters = get_hyperparameters(trainloader)
     list_of_models = get_list_of_models_by_path(trainloader, trainloader.dataset.model_backbone, current_supergroup.value, inputs_to_model)
 
-    optimizer = torch.optim.Adam(list_of_models[-1].parameters(), lr=hyperparameters[f'{current_supergroup.value}_learning_rate'], weight_decay=hyperparameters[f'{current_supergroup.value}_weight_decay'])
+    optimizer = torch.optim.Adam(list_of_models[-1].parameters(), lr=hyperparameters[current_supergroup.value]["learning_rate"], weight_decay=hyperparameters[current_supergroup.value]["weight_decay"])
     path_save_model = os.path.join(trainloader.dataset.path_to_outputs, f"model_weights/{current_supergroup.value}.pt")
 
     if(os.path.exists(path_save_model)):
-        image_shape = train(list_of_models=list_of_models, current_supergroup=current_supergroup.value, epochs=hyperparameters[f'{current_supergroup.value}_epochs'], optimizer=optimizer, model_save_path=path_save_model, trainloader=trainloader, validationloader=testloader)
+        image_shape = train(list_of_models=list_of_models, current_supergroup=current_supergroup.value, epochs=hyperparameters[current_supergroup.value]["epochs"], optimizer=optimizer, model_save_path=path_save_model, trainloader=trainloader, validationloader=testloader)
         current_supergroup.output_image_shape = image_shape
         trainloader.dataset.update_tree_attributes(nodes_dict) # update these attributes in the tree
     else:
@@ -220,7 +220,6 @@ def improve_modules_accuracy(trainloader, testloader, current_supergroup):
     for child in current_supergroup.children:
         if(child.value not in trainloader.dataset.get_leaf_nodes()):
             improve_modules_accuracy(trainloader, testloader, child)
-
 
 def format_time(runtime):
     """
@@ -247,18 +246,23 @@ def format_time(runtime):
 def main():
     start_time = time.time()
     args = parser()
+    config = get_hyperparameters(f"./Datasets/{args.dataset}/{args.model_backbone}")
+
     if(args.improve_model_weights):
         ### Improving the validation accuracy of a trained module
         # Download datasets
-        train_dataset = GenerateDataset(args.dataset.lower(), args.model_backbone.lower(), train=True, re_train=True)
-        test_dataset = GenerateDataset(args.dataset.lower(), args.model_backbone.lower(), train=False, re_train=True)
+        train_dataset = GenerateDataset(args.dataset.lower(), args.model_backbone.lower(), config, train=True, re_train=True)
+        test_dataset = GenerateDataset(args.dataset.lower(), args.model_backbone.lower(), config, train=False, re_train=True)
 
         # Create dataloaders
-        trainloader = get_dataloader(train_dataset, args.train_batch_size, args.num_workers, shuffle=True)
-        testloader = get_dataloader(test_dataset, args.eval_batch_size, args.num_workers, shuffle=True)
+        trainloader = get_dataloader(train_dataset, config, train=True, validation=False)
+        testloader = get_dataloader(test_dataset, config, train=True, validation=True)
         
+        current_supergroup = args.improve_model_weights
         nodes_dict = trainloader.dataset.get_dictionary_of_nodes()
-        improve_modules_accuracy(trainloader, testloader, current_supergroup=nodes_dict[args.improve_model_weights])
+        current_node = nodes_dict[current_supergroup]
+        re_train_hyperparameters = config.retrain
+        improve_modules_accuracy(trainloader, testloader, re_train_hyperparameters, current_supergroup=current_node)
 
         nodes_dict = trainloader.dataset.get_dictionary_of_nodes() # updated nodes_dict
         inputs_to_model = update_inputs_for_model(nodes_dict, trainloader.dataset.image_shape)
@@ -271,19 +275,18 @@ def main():
     if(args.train):
         ### Training the entire tree
         # Download datasets
-        train_dataset = GenerateDataset(args.dataset.lower(), args.model_backbone.lower(), train=True)
-        test_dataset = GenerateDataset(args.dataset.lower(), args.model_backbone.lower(), train=False)
+        train_dataset = GenerateDataset(args.dataset.lower(), args.model_backbone.lower(), config, train=True)
+        test_dataset = GenerateDataset(args.dataset.lower(), args.model_backbone.lower(), config, train=False)
 
         # Dataset features
         class_labels = train_dataset.labels # List of unique classes in the dataset
         image_shape = train_dataset.image_shape # Get the shape of the image in the dataset (1xCxHxW)
 
         # Create dataloaders
-        trainloader = get_dataloader(train_dataset, args.train_batch_size, args.num_workers, shuffle=True)
-        testloader = get_dataloader(test_dataset, args.eval_batch_size, args.num_workers, shuffle=True)
+        trainloader = get_dataloader(train_dataset, config, train=True, validation=False)
+        testloader = get_dataloader(test_dataset, config, train=True, validation=True)
         
         # Train supergroups
-        hyperparameters = get_hyperparameters(trainloader)
         supergroup_queue = deque(["root"]) # queue to keep track of all the supergroups to train
 
         while(supergroup_queue):
@@ -317,6 +320,7 @@ def main():
 
             # Train the current supergroup of the MNN tree
             print(f"Training Started on Module {current_supergroup}")
+            hyperparameters = config.hyperparameters
             optimizer = torch.optim.Adam(list_of_models[-1].parameters(), lr=hyperparameters['learning_rate'], weight_decay=hyperparameters['weight_decay'])
             path_save_model = os.path.join(trainloader.dataset.path_to_outputs, f"model_weights/{current_supergroup}.pt")
             image_shape = train(list_of_models=list_of_models, current_supergroup=current_supergroup, epochs=hyperparameters['epochs'], optimizer=optimizer, model_save_path=path_save_model, trainloader=trainloader, validationloader=testloader)
@@ -354,7 +358,7 @@ def main():
                 list_of_models = get_list_of_models_by_path(dataloader=trainloader, model_backbone=args.model_backbone, current_supergroup=current_supergroup, dictionary_of_inputs_for_models=dictionary_of_inputs_for_models, debug_flag=args.debug) # reset the weights of the current supergroup so we don't load its state_dict
                 
                 optimizer = torch.optim.Adam(list_of_models[-1].parameters(), lr=hyperparameters["descendant_learning_rate"], weight_decay=hyperparameters["descendant_weight_decay"])
-                image_shape = train(list_of_models=list_of_models, current_supergroup=current_supergroup, epochs=hyperparameters['epochs'], optimizer=optimizer, model_save_path=path_save_model, trainloader=trainloader, validationloader=testloader)
+                image_shape = train(list_of_models=list_of_models, current_supergroup=current_supergroup, epochs=hyperparameters['descendant_epochs'], optimizer=optimizer, model_save_path=path_save_model, trainloader=trainloader, validationloader=testloader)
                 image_shape = tuple(image_shape[1:]) # change from (BxCxHxW) -> (CxHxW)
 
             nodes_dict[current_supergroup].output_image_shape = image_shape
@@ -371,11 +375,11 @@ def main():
     if(args.infer):
         ### Conduct inference on the trained tree
         # Download datasets and create dataloader
-        test_dataset = GenerateDataset(args.dataset.lower(), args.model_backbone.lower(), train=False)
-        testloader = get_dataloader(test_dataset, batch_size=1, num_workers=args.num_workers, shuffle=True)
+        test_dataset = GenerateDataset(args.dataset.lower(), args.model_backbone.lower(), config, train=False)
+        testloader = get_dataloader(test_dataset, config)
         
-        conf = test(testloader)
-        display_confusion_matrix(conf, testloader)
+        confusion_matrix = test(testloader)
+        display_confusion_matrix(confusion_matrix, testloader)
 
         end_time = time.time()
         print(f"Finished Testing TRUNK in " + format_time(end_time - start_time))
