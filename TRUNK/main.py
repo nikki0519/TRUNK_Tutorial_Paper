@@ -245,7 +245,7 @@ def format_time(runtime):
 def main():
     start_time = time.time()
     args = parser()
-    config = get_hyperparameters(f"./Datasets/{args.dataset}/{args.model_backbone}")
+    config = get_hyperparameters(f"./Datasets/{args.dataset.lower()}/{args.model_backbone.lower()}")
 
     if(args.improve_model_weights):
         ### Improving the validation accuracy of a trained module
