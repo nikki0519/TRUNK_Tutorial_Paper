@@ -11,10 +11,10 @@ The data (EMNIST, CiFAR10, and SVHN) used to train and test the TRUNK model will
 
 ```bash
 # To train TRUNK
-$ python main.py --train --dataset emnist --model_backbone mobilenet --num_workers 2 --debug 
+$ python main.py --train --dataset emnist --model_backbone mobilenet 
 
 # To conduct inference on TRUNK
-$ python main.py --infer --dataset emnist --model_backbone mobilenet --num_workers 2 --debug
+$ python main.py --infer --dataset emnist --model_backbone mobilenet
 ```
 
 To measure the memory size, number of floating point operations (FLOPs), number of trainable parameters, to visualize the tree for a specific dataset, to compare the ASL of an untrained root and a trained root node, and to get the sigmoid membership for a category from a trained node, execute the metrics.py script as follows
