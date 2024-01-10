@@ -32,7 +32,6 @@ def parser():
     parser.add_argument("--improve_model_weights", type=str, help="Improve a certain supergroup's validation accuracy by optimizing its parameters")
     parser.add_argument("--dataset", type=str, help="emnist, svhn, cifar10", default="emnist")
     parser.add_argument("--model_backbone", type=str, help="vgg or mobilenet", default="mobilenet")
-    parser.add_argument("--config", type=str, help="Path to config")
     parser.add_argument("--debug", action="store_true", help="Print information for debugging purposes")
     args = parser.parse_args()
     return args
