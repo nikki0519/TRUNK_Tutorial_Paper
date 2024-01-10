@@ -1,0 +1,49 @@
+dataset:
+  train:
+    params:
+      batch_size: 16
+      num_workers: 2
+      shuffle: True
+    transform:
+    - type: ToTensor
+    - type: Normalize
+      params:
+        mean:
+        - 0.485
+        - 0.456
+        - 0.406
+        std:
+        - 0.229
+        - 0.224
+        - 0.225
+  validation:
+    params:
+      batch_size: 16
+      num_workers: 2
+      shuffle: True
+    transform:
+    - type: ToTensor
+    - type: Normalize
+      params:
+        mean:
+        - 0.485
+        - 0.456
+        - 0.406
+        std:
+        - 0.229
+        - 0.224
+        - 0.225
+  test:
+    params:
+      batch_size: 1
+      num_workers: 2
+      shuffle: True
+hyperparameters:
+  learning_rate: 0.001
+  weight_decay: 0.0005
+  epochs: 40
+  grouping_volatility: 0.95
+  descendant_learning_rate: 0.001
+  descendant_weight_decay: 0.0005
+  descendant_epochs: 40
+retrain:

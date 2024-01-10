@@ -1,0 +1,28 @@
+dataset:
+  train:
+    params:
+      batch_size: 16
+      num_workers: 2
+      shuffle: True
+    transform:
+    - type: ToTensor
+  validation:
+    params:
+      batch_size: 16
+      num_workers: 2
+      shuffle: True
+    transform:
+    - type: ToTensor
+  test:
+    params:
+      batch_size: 1
+      num_workers: 2
+      shuffle: True
+hyperparameters:
+  learning_rate: 0.001
+  weight_decay: 0.0001
+  epochs: 5
+  grouping_volatility: 1.20
+  descendant_learning_rate: 0.01
+  descendant_weight_decay: 0.0005
+  descendant_epochs: 5

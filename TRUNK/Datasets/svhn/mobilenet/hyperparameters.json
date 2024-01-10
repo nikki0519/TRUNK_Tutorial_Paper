@@ -1,8 +1,0 @@
-{
-    "learning_rate": 1e-4,
-    "weight_decay": 5e-4,
-    "epochs": 20,
-    "grouping_volatility": 0.7,
-    "descendant_learning_rate": 0.5e-2,
-    "descendant_weight_decay": 5e-4
-}
