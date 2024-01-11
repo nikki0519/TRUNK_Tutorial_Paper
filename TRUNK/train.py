@@ -3,6 +3,7 @@ import torch
 import torch.nn as nn
 from tqdm import tqdm
 from torch.optim import lr_scheduler
+import torch.optim as optim
 
 ## Global Variables
 device = "cuda" if torch.cuda.is_available() else "cpu"
@@ -11,31 +12,40 @@ device = torch.device(device) # push the device to the gpu if gpu is available o
 
 loss_function = nn.NLLLoss() # loss function used to compute loss during training and validation
 
-def get_scheduler(scheduler_config, optimizer):
+def get_training_details(config, current_sg_model):
     """
     Get the scheduler function based on the config file
 
     Parameters
     ----------
-    scheduler_config: dict
-        dictionary containing information on the scheduler
+    config: dict
+        dictionary containing information on the hyperparameters and training regime
 
-    optimizer: torch.optim.adam.Adam
-        The optimizer used to step down the loss curve
+    current_sg_model: torch.nn.Module
+        The current supergroup's network
 
     Return
     ------
     scheduler: torch.optim.lr_scheduler
     """
+    epochs = config['epochs']
+    optimizer_config = config.optimizer[0]
+    scheduler_config = config.lr_scheduler[0]
 
-    scheduler_config = scheduler_config[0]
+    optimizer_type = optimizer_config['type']
+    params = optimizer_config.get('params', {})
+    optimizer_class = getattr(optim, optimizer_type)
+    optimizer = optimizer_class(current_sg_model.parameters(), **params)
+
     scheduler_type = scheduler_config['type']
     params = scheduler_config.get('params', {})
     scheduler_class = getattr(lr_scheduler, scheduler_type)
-    return scheduler_class(optimizer, **params)
+    scheduler = scheduler_class(optimizer, **params)
+
+    return scheduler, optimizer, epochs
 
 
-def train(list_of_models, current_supergroup, epochs, optimizer, scheduler_config, model_save_path, trainloader, validationloader):
+def train(list_of_models, current_supergroup, config, model_save_path, trainloader, validationloader):
     """
     Train the current supergroup module
 
@@ -49,15 +59,9 @@ def train(list_of_models, current_supergroup, epochs, optimizer, scheduler_confi
     
     epochs: int
         Number of epochs to train for
-    
-    optimizer: torch.optim.adam.Adam
-        The optimizer used to step down the loss curve
 
-    loss_function: func
-        Function used to calculate the loss function
-
-    scheduler_config: dict
-        dictionary containing information on the scheduler
+    config: dict
+        dictionary containing information on the hyperparameters and training regime
 
     model_save_path: str
         the path to save the trained supergroup module
@@ -74,7 +78,7 @@ def train(list_of_models, current_supergroup, epochs, optimizer, scheduler_confi
         the new shape of the feature map
     """
     # scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(optimizer, T_max=10, eta_min=0)
-    scheduler = get_scheduler(scheduler_config, optimizer)
+    scheduler, optimizer, epochs = get_training_details(config, list_of_models[-1])
     max_validation_accuracy = 0.0 # keep track of the maximum accuracy to know which model to save after conducting validation
     for epoch in range(1, epochs+1):
         count = 0 # Count the number of times we get a true positive result in a batch, used to calculate accuracy

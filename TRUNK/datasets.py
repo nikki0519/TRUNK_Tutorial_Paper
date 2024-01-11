@@ -449,11 +449,6 @@ def load_dataset(dataset, config, train=False):
 								split="train",
 								download=True,
 								transform=transform)
-			# extra_data = datasets.SVHN(root="../data/train/",
-			# 					split="extra",
-			# 					download=True,
-			# 					transform=transform)
-			# return torch.utils.data.ConcatDataset([extra_data, train_data])
 		
 		elif(dataset == "cifar10"):
 			return datasets.CIFAR10(root="../data/train/", 

@@ -181,7 +181,7 @@ def update_inputs_for_model(nodes_dict, image_shape):
     
     return dictionary_of_inputs_for_models
 
-def improve_modules_accuracy(trainloader, testloader, hyperparameters, current_supergroup):
+def improve_modules_accuracy(trainloader, testloader, config, current_supergroup):
     """
     Improve the accuracy of the module based on the updated hyper-parameters provided in the json file 
 
@@ -193,7 +193,7 @@ def improve_modules_accuracy(trainloader, testloader, hyperparameters, current_s
     testloader: torch.utils.data.DataLoader
         iterable testing dataset
 
-    hyperparameters: dict
+    config: dict
         dictionary of re-train hyperparameters
 
     current_supergroup: TreeNode
@@ -205,12 +205,11 @@ def improve_modules_accuracy(trainloader, testloader, hyperparameters, current_s
     nodes_dict = trainloader.dataset.get_dictionary_of_nodes()
     inputs_to_model = update_inputs_for_model(nodes_dict, trainloader.dataset.image_shape)
     list_of_models = get_list_of_models_by_path(trainloader, trainloader.dataset.model_backbone, current_supergroup.value, inputs_to_model)
-
-    optimizer = torch.optim.Adam(list_of_models[-1].parameters(), lr=hyperparameters[current_supergroup.value]["learning_rate"], weight_decay=hyperparameters[current_supergroup.value]["weight_decay"])
     path_save_model = os.path.join(trainloader.dataset.path_to_outputs, f"model_weights/{current_supergroup.value}.pt")
 
     if(os.path.exists(path_save_model)):
-        image_shape = train(list_of_models=list_of_models, current_supergroup=current_supergroup.value, epochs=hyperparameters[current_supergroup.value]["epochs"], optimizer=optimizer, model_save_path=path_save_model, trainloader=trainloader, validationloader=testloader)
+        hyperparameters = config[current_supergroup.value]
+        image_shape = train(list_of_models=list_of_models, current_supergroup=current_supergroup.value, config=hyperparameters, model_save_path=path_save_model, trainloader=trainloader, validationloader=testloader)
         current_supergroup.output_image_shape = image_shape
         trainloader.dataset.update_tree_attributes(nodes_dict) # update these attributes in the tree
     else:
@@ -319,10 +318,8 @@ def main():
 
             # Train the current supergroup of the MNN tree
             print(f"Training Started on Module {current_supergroup}")
-            hyperparameters = config.hyperparameters
-            optimizer = torch.optim.Adam(list_of_models[-1].parameters(), lr=hyperparameters['learning_rate'], weight_decay=hyperparameters['weight_decay'])
             path_save_model = os.path.join(trainloader.dataset.path_to_outputs, f"model_weights/{current_supergroup}.pt")
-            image_shape = train(list_of_models=list_of_models, current_supergroup=current_supergroup, epochs=hyperparameters['epochs'], optimizer=optimizer, scheduler_config=hyperparameters['lr_scheduler'], model_save_path=path_save_model, trainloader=trainloader, validationloader=testloader)
+            image_shape = train(list_of_models=list_of_models, current_supergroup=current_supergroup, config=config.class_hyperparameters, model_save_path=path_save_model, trainloader=trainloader, validationloader=testloader)
             image_shape = tuple(image_shape[1:]) # change from (BxCxHxW) -> (CxHxW)
 
             # Create the average softmax of this current trained supergroup
@@ -334,7 +331,7 @@ def main():
             # Update the target_map based on the softmax of the current supergroup
             print("Updating TargetMap")
             path_decisions = trainloader.dataset.get_path_decisions() # the paths down the tree from the root node to each supergroup
-            list_of_new_supergroups = update_target_map(trainloader, current_supergroup, hyperparameters['grouping_volatility'], path_to_softmax_matrix, path_decisions[current_supergroup], debug=args.debug)
+            list_of_new_supergroups = update_target_map(trainloader, current_supergroup, config.grouping_hyperparameters['grouping_volatility'], path_to_softmax_matrix, path_decisions[current_supergroup], debug=args.debug)
             nodes_dict = trainloader.dataset.get_dictionary_of_nodes() # updated dictionary of nodes
 
             # If there are new supergroups then add it to the end of the queue and update the dictionary_of_inputs_for_models
@@ -356,8 +353,7 @@ def main():
                 dictionary_of_inputs_for_models[current_supergroup][1] = num_children # changing the number of groups for the model to distinguish between
                 list_of_models = get_list_of_models_by_path(dataloader=trainloader, model_backbone=args.model_backbone, current_supergroup=current_supergroup, dictionary_of_inputs_for_models=dictionary_of_inputs_for_models, debug_flag=args.debug) # reset the weights of the current supergroup so we don't load its state_dict
                 
-                optimizer = torch.optim.Adam(list_of_models[-1].parameters(), lr=hyperparameters["descendant_learning_rate"], weight_decay=hyperparameters["descendant_weight_decay"])
-                image_shape = train(list_of_models=list_of_models, current_supergroup=current_supergroup, epochs=hyperparameters['descendant_epochs'], optimizer=optimizer, model_save_path=path_save_model, trainloader=trainloader, validationloader=testloader)
+                image_shape = train(list_of_models=list_of_models, current_supergroup=current_supergroup, config=config.grouping_hyperparameters, model_save_path=path_save_model, trainloader=trainloader, validationloader=testloader)
                 image_shape = tuple(image_shape[1:]) # change from (BxCxHxW) -> (CxHxW)
 
             nodes_dict[current_supergroup].output_image_shape = image_shape
