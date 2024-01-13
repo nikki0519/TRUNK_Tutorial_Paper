@@ -5,6 +5,16 @@ dataset:
       num_workers: 2
       shuffle: True
     transform:
+    - type: Resize
+      params:
+        size:
+        - 70
+        - 70
+    - type: RandomCrop
+      params:
+        size:
+        - 64
+        - 64
     - type: ToTensor
     - type: Normalize
       params:
@@ -22,6 +32,16 @@ dataset:
       num_workers: 2
       shuffle: True
     transform:
+    - type: Resize
+      params:
+        size:
+        - 70
+        - 70
+    - type: RandomCrop
+      params:
+        size:
+        - 64
+        - 64
     - type: ToTensor
     - type: Normalize
       params:
@@ -38,12 +58,29 @@ dataset:
       batch_size: 1
       num_workers: 2
       shuffle: True
-hyperparameters:
-  learning_rate: 0.001
-  weight_decay: 0.0005
-  epochs: 40
-  grouping_volatility: 0.95
-  descendant_learning_rate: 0.001
-  descendant_weight_decay: 0.0005
-  descendant_epochs: 40
+class_hyperparameters:
+  lr_scheduler: 
+  - type: CosineAnnealingLR
+    params:
+      T_max: 10
+      eta_min: 0
+  optimizer: 
+  - type: Adam
+    params:
+      learning_rate: 0.001
+      weight_decay: 0.0005
+  epochs: 15
+grouping_hyperparameters:
+  grouping_volatility: 0.65
+  lr_scheduler: 
+  - type: CosineAnnealingLR
+    params:
+      T_max: 10
+      eta_min: 0
+  optimizer: 
+  - type: Adam
+    params:
+      learning_rate: 0.001
+      weight_decay: 0.0005
+  epochs: 30
 retrain:
