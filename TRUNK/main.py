@@ -13,16 +13,8 @@ import time
 from omegaconf import OmegaConf
 
 # Global Variables
-config = get_hyperparameters(f"./Datasets/{args.dataset.lower()}/{args.model_backbone.lower()}")
 device = "cuda" if torch.cuda.is_available() else "cpu"
 print(f"Device is on {device} for main.py")
-
-## set seed
-torch.manual_seed(config.seed)
-if(device == "cuda"):
-    torch.cuda.manual_seed(config.seed)
-
-## move everything to gpu
 device = torch.device(device)
 
 def parser():
@@ -252,6 +244,12 @@ def format_time(runtime):
 def main():
     start_time = time.time()
     args = parser()
+    config = get_hyperparameters(f"./Datasets/{args.dataset.lower()}/{args.model_backbone.lower()}")
+
+    ## set seed
+    torch.manual_seed(config.seed)
+    if(torch.cuda.is_available()):
+        torch.cuda.manual_seed(config.seed)
 
     if(args.improve_model_weights):
         ### Improving the validation accuracy of a trained module
