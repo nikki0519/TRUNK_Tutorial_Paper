@@ -1,3 +1,10 @@
+# ----------------------------------------------------
+# Name: metrics.py
+# Purpose: Script to train and test mobilenetv2
+# Author: Nikita Ravi
+# Created: February 24, 2024
+# ----------------------------------------------------
+
 # Import necessary libraries
 from torchvision.models import mobilenet_v2
 import torch.nn as nn

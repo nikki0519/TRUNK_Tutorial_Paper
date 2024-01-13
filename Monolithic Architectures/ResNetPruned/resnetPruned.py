@@ -1,3 +1,10 @@
+# ----------------------------------------------------
+# Name: metrics.py
+# Purpose: Script to train and test resnet pruned
+# Author: Nikita Ravi
+# Created: February 24, 2024
+# ----------------------------------------------------
+
 # Import necessary libraries
 from torchvision.models import resnet50
 import torch.nn as nn

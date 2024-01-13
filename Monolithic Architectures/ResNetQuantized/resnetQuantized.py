@@ -1,3 +1,10 @@
+# ----------------------------------------------------
+# Name: metrics.py
+# Purpose: Script to train and test resnet quantized
+# Author: Nikita Ravi
+# Created: February 24, 2024
+# ----------------------------------------------------
+
 # Import necessary libraries
 from torchvision.models import resnet50
 from torch.ao.quantization import QuantStub, DeQuantStub, fuse_modules, get_default_qconfig, prepare_qat, convert

@@ -1,3 +1,10 @@
+# ----------------------------------------------------
+# Name: metrics.py
+# Purpose: Script to train and test convnext
+# Author: Nikita Ravi
+# Created: February 24, 2024
+# ----------------------------------------------------
+
 # Import necessary libraries
 import torchvision.models as models
 import torch.nn as nn

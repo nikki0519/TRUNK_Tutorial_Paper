@@ -1,10 +1,16 @@
+# ----------------------------------------------------
+# Name: metrics.py
+# Purpose: Script to train and test resnet
+# Author: Nikita Ravi
+# Created: February 24, 2024
+# ----------------------------------------------------
+
 # Import necessary libraries
 from torchvision.models import resnet50
 import torch.nn as nn
 import torch
 import numpy as np
 from metrics import *
-
 
 # Global Variables
 device = "cuda" if torch.cuda.is_available() else "cpu"
