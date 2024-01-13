@@ -1,3 +1,10 @@
+# ----------------------------------------------------
+# Name: pathDecisions.py
+# Purpose: Script to build the TRUNK tree
+# Author: Nikita Ravi
+# Created: February 24, 2024
+# ----------------------------------------------------
+
 # Import necessary libraries
 import re
 import pickle

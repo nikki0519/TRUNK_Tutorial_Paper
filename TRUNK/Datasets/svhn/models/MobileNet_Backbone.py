@@ -1,3 +1,10 @@
+# ----------------------------------------------------
+# Name: MobileNet_Backbone.py
+# Purpose: Script to create the mobilenet class for svhn dataset
+# Author: Nikita Ravi
+# Created: February 24, 2024
+# ----------------------------------------------------
+
 # Import necessary packages
 import torch
 import torch.nn as nn

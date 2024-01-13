@@ -1,3 +1,11 @@
+# ----------------------------------------------------
+# Name: VGGNet_Backbone.py
+# Purpose: Script to create the vgg class for emnist dataset
+# Author: Nikita Ravi
+# Created: February 24, 2024
+# ----------------------------------------------------
+
+# Import necessary libraries
 import torch
 import torch.nn as nn
 

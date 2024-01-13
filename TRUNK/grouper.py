@@ -1,3 +1,10 @@
+# ----------------------------------------------------
+# Name: grouper.py
+# Purpose: Script to group the similar categories
+# Author: Nikita Ravi
+# Created: February 24, 2024
+# ----------------------------------------------------
+
 # Import necessary libraries
 import torch
 import torch.nn as nn

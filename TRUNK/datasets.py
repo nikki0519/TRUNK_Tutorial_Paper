@@ -1,3 +1,10 @@
+# ----------------------------------------------------
+# Name: datasets.py
+# Purpose: Script to download and pre-process the dataset chosen by the user
+# Author: Nikita Ravi
+# Created: February 24, 2024
+# ----------------------------------------------------
+
 # Import necessary libraries
 from torchvision import datasets
 from torchvision import transforms

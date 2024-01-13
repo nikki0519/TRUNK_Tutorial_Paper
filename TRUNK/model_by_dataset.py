@@ -1,3 +1,11 @@
+# ----------------------------------------------------
+# Name: model_by_dataset.py
+# Purpose: Script to gather the appropriate network based on the dataset and supergroup
+# Author: Nikita Ravi
+# Created: February 24, 2024
+# ----------------------------------------------------
+
+# Import necessary libraries
 from Datasets.emnist.models.MobileNet_Backbone import MNN as emnist_mobilenet
 from Datasets.emnist.models.VGGNet_Backbone import MNN as emnist_vgg
 from Datasets.cifar10.models.MobileNet_Backbone import MNN as cifar10_mobilenet

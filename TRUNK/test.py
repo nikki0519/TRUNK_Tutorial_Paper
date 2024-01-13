@@ -1,3 +1,10 @@
+# ----------------------------------------------------
+# Name: test.py
+# Purpose: Script to conduct inference on the chosen dataset using TRUNK
+# Author: Nikita Ravi
+# Created: February 24, 2024
+# ----------------------------------------------------
+
 # Import necessary libraries
 import torch
 from tqdm import tqdm

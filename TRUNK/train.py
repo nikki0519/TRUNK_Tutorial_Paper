@@ -1,3 +1,10 @@
+# ----------------------------------------------------
+# Name: train.py
+# Purpose: Script to train the TRUNK network
+# Author: Nikita Ravi
+# Created: February 24, 2024
+# ----------------------------------------------------
+
 # Import necessary libraries
 import torch
 import torch.nn as nn
