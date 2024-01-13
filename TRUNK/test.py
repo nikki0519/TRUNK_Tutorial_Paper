@@ -6,7 +6,6 @@ import numpy as np
 import matplotlib.pyplot as plt
 import seaborn as sns
 import json
-from lightning.fabric import Fabric
 
 from Datasets.emnist.models.MobileNet_Backbone import MNN as emnist_mobilenet
 from Datasets.emnist.models.VGGNet_Backbone import MNN as emnist_vgg
