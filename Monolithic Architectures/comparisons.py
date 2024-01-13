@@ -1,3 +1,10 @@
+# ----------------------------------------------------
+# Name: comparisons.py
+# Purpose: Script to execute the necessary function calls based on the user's needs
+# Author: Nikita Ravi
+# Created: February 24, 2024
+# ----------------------------------------------------
+
 # Import necessary libraries
 from torchvision import datasets
 import torchvision.transforms as tvt

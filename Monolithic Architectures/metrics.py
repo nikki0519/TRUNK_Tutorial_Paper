@@ -1,4 +1,10 @@
-# Purpose of this file is to evaluate the different metrics for the different models
+# ----------------------------------------------------
+# Name: metrics.py
+# Purpose: Script to measure the metrics of the TRUNK network
+# Author: Nikita Ravi
+# Created: February 24, 2024
+# ----------------------------------------------------
+
 # Import necessary libraries
 import os
 import torch
