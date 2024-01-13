@@ -33,13 +33,16 @@ $ python metrics.py --dataset emnist --model_backbone mobilenet --visualize --un
 ```
 
 ## Results
-TRUNK achieves the following performance on
+TRUNK achieves the following performance on each of the datasets as shown below. The memory and G-FLOPs are measured on the shortest and longest branch of the tree.
 
 | Dataset Name       | Pre-Trained Weights                                                               | Inference Accuracy [%]| Inference Time per Image [s/Image]| Memory [MB]  | G-FLOPs    |
 | ------------------ |-----------------------------------------------------------------------------------| --------------------- |-----------------------------------| -----------  |------------|
 | EMNIST             | [EMNIST Pre-Trained Weights](Datasets/cifar10/mobilenet_81/model_weights/root.pt) |     80.88             | 49.63                             | 0.23 - 0.76  |0.04 - 0.37 |
+| ------------------ |-----------------------------------------------------------------------------------| --------------------- |-----------------------------------| -----------  |------------|
 | CIFAR10            | [CIFAR10 Pre-Trained Weights](Datasets/emnist/mobilenet/model_weights/root.pt)    |     81.36             | 57.60                             | 1.25 - 17.74 |0.36 - 4.81 |
+| ------------------ |-----------------------------------------------------------------------------------| --------------------- |-----------------------------------| -----------  |------------|
 | SVHN               | [SVHN Pre-Trained Weights](Datasets/svhn/mobilenet/model_weights/root.pt)         |     86.86             | 37.45                             | 0.23 - 0.76  |0.04 - 0.40 |
+| ------------------ |-----------------------------------------------------------------------------------| --------------------- |-----------------------------------| -----------  |------------|
 
 [1]: https://arxiv.org/pdf/1801.04381.pdf
 [2]: https://arxiv.org/pdf/1409.1556.pdf 
