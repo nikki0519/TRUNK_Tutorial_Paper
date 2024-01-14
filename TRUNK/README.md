@@ -5,7 +5,7 @@ Despite effectively reducing the memory requirements, most low-powered computer 
 
 The Datasets directory is further divided into the three folderes representing the three datasets (i.e. EMNSIT, CiFAR10, SVHN) we've used to train/test TRUNK. Within these folders, we have the models/ directory where the MobileNetv2 and VGG16 networks are saved. Within the mobilenet/ and vgg/ directories, the inputs and results (i.e. hyper-parameters, model weights, model softmax, details of the tree, and inference results) are stored. 
 
-The architecture design varies by the different datasets used and is inspired by the [MobileNetv2][1] and [VGG-16][2] networks. The pre-trained weights are available for the MobileNet inspired architecture. The networks for each dataset are found in Datasets/<dataset name>/models
+The architecture design varies by the different datasets used and is inspired by the [MobileNetv2][1] and [VGG-16][2] networks. The pre-trained weights are available for the MobileNet inspired architecture. The networks for each dataset are found in Datasets/dataset name/models
 
 The data (EMNIST, CiFAR10, and SVHN) used to train and test the TRUNK model will be downloaded from torchvision when executing the main.py script as shown below
 
@@ -15,7 +15,7 @@ To train TRUNK in the paper for a particular dataset, run this command:
 ```train
 $ python main.py --train --dataset emnist --model_backbone mobilenet 
 ```
-The hyperparameters used to train TRUNK on the specific dataset are loaded into the training script from the hyperparameters.yaml file which is found in the Datasets/<dataset name>. 
+The hyperparameters used to train TRUNK on the specific dataset are loaded into the training script from the hyperparameters.yaml file which is found in the Datasets/dataset name. 
 
 ## Evaluation
 To evaluate TRUNK on a particular dataset, run:
@@ -23,7 +23,7 @@ To evaluate TRUNK on a particular dataset, run:
 ```eval
 $ python main.py --infer --dataset emnist --model_backbone mobilenet
 ```
-The hyperparameters used to conduct inference using TRUNK on the specific dataset are loaded into the test script from the hyperparameters.yaml file which is found in the Datasets/<dataset name>. 
+The hyperparameters used to conduct inference using TRUNK on the specific dataset are loaded into the test script from the hyperparameters.yaml file which is found in the Datasets/dataset name. 
 
 ## Metrics
 To measure the memory size, number of floating point operations (FLOPs), number of trainable parameters, to visualize the tree for a specific dataset, to compare the ASL of an untrained root and a trained root node, and to get the sigmoid membership for a category from a trained node, execute the metrics.py script as follows
