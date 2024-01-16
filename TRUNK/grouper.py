@@ -64,9 +64,9 @@ def AverageSoftmax(list_of_models, dataloader, current_supergroup, softmax_file_
 				true_node_idx = path_decisions[current_supergroup][depth]
 				depth += 1
 
-				indices = torch.nonzero(current_node_in_batch == true_node_idx, as_tuple=True)[0] # identify all the images in the batch that have the same node as the node identified as by path_decisions at the current depth and record its indices 
+				indices = torch.nonzero(current_node_in_batch == true_node_idx)[:,0] # identify all the images in the batch that have the same node as the node identified as by path_decisions at the current depth and record its indices 
 				if(len(indices) > 0): # check if there are images whose predicted nodes from the target_map match the true node
-					new_indices = indices
+					new_indices = indices.cpu()
 					for curr_depth in range(model_idx, 0, -1):
 						# this loop will iterate back to previous depths from the current depth to identify the images that have the right node at every depth and only preserve those images by recording only those indices
 						new_indices = indices_encountered[curr_depth - 1][new_indices]
