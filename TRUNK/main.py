@@ -225,8 +225,13 @@ def main():
     if(args.train or args.retrain):
         ### Training the entire tree
         # Download datasets
-        train_dataset = GenerateDataset(args.dataset.lower(), args.model_backbone.lower(), config, train=True)
-        test_dataset = GenerateDataset(args.dataset.lower(), args.model_backbone.lower(), config, train=False)
+
+        if(args.retrain):
+            train_dataset = GenerateDataset(args.dataset.lower(), args.model_backbone.lower(), config, train=True, re_train=True)
+            test_dataset = GenerateDataset(args.dataset.lower(), args.model_backbone.lower(), config, train=False, re_train=True)
+        else:
+            train_dataset = GenerateDataset(args.dataset.lower(), args.model_backbone.lower(), config, train=True)
+            test_dataset = GenerateDataset(args.dataset.lower(), args.model_backbone.lower(), config, train=False)
 
         # Dataset features
         class_labels = train_dataset.labels # List of unique classes in the dataset
