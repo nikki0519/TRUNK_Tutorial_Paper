@@ -239,6 +239,7 @@ def main():
         # Train supergroups
         if(args.retrain):
             supergroup_queue = deque([args.retrain]) # queue to keep track of all the supergroups to train
+            config = config.retrain[args.retrain]
         else:
             supergroup_queue = deque(["root"]) # queue to keep track of all the supergroups to train
 
