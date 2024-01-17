@@ -48,7 +48,7 @@ class_hyperparameters:
   optimizer: 
   - type: Adam
     params:
-      learning_rate: 0.001
+      lr: 0.001
       weight_decay: 0.0005
   epochs: 40
 grouping_hyperparameters:
@@ -61,7 +61,6 @@ grouping_hyperparameters:
   optimizer: 
   - type: Adam
     params:
-      learning_rate: 0.001
+      lr: 0.001
       weight_decay: 0.0005
   epochs: 40
-retrain:

@@ -33,10 +33,10 @@ def parser():
     args: argparse.Namespace
         user arguments 
     """
+    
     parser = argparse.ArgumentParser(description="TRUNK for Image Classification")
     parser.add_argument("--train", action="store_true", help="Conduct training")
     parser.add_argument("--infer", action="store_true", help="Conduct inference")
-    parser.add_argument("--improve_model_weights", type=str, help="Improve a certain supergroup's validation accuracy by optimizing its parameters")
     parser.add_argument("--dataset", type=str, help="emnist, svhn, cifar10", default="emnist")
     parser.add_argument("--model_backbone", type=str, help="vgg or mobilenet", default="mobilenet")
     parser.add_argument("--debug", action="store_true", help="Print information for debugging purposes")
@@ -95,6 +95,7 @@ def get_list_of_models_by_path(dataloader, model_backbone, current_supergroup, d
     list_of_models = []
     for idx, supergroup in enumerate(list_of_groups):
         image_shape, num_classes = dictionary_of_inputs_for_models[supergroup]
+        print(f"Image Shape: {image_shape}, Num Classes: {num_classes}")
         model = get_model(dataloader=dataloader, model_backbone=model_backbone.lower(), number_of_classes=num_classes, image_shape=image_shape, current_supergroup=current_supergroup, supergroup=supergroup, debug_flag=debug_flag)
         list_of_models.append(model)
     return list_of_models
@@ -188,44 +189,6 @@ def update_inputs_for_model(nodes_dict, image_shape):
     
     return dictionary_of_inputs_for_models
 
-def improve_modules_accuracy(trainloader, testloader, config, current_supergroup):
-    """
-    Improve the accuracy of the module based on the updated hyper-parameters provided in the json file 
-
-    Parameters
-    ----------
-    trainloader: torch.utils.data.DataLoader
-        iterable training dataset
-
-    testloader: torch.utils.data.DataLoader
-        iterable testing dataset
-
-    config: dict
-        dictionary of re-train hyperparameters
-
-    current_supergroup: TreeNode
-        Re-training the current supergroup to improve the validation accuracy based on the new hyperparameters
-    """
-    if(current_supergroup is None):
-        return
-
-    nodes_dict = trainloader.dataset.get_dictionary_of_nodes()
-    inputs_to_model = update_inputs_for_model(nodes_dict, trainloader.dataset.image_shape)
-    list_of_models = get_list_of_models_by_path(trainloader, trainloader.dataset.model_backbone, current_supergroup.value, inputs_to_model)
-    path_save_model = os.path.join(trainloader.dataset.path_to_outputs, f"model_weights/{current_supergroup.value}.pt")
-
-    if(os.path.exists(path_save_model)):
-        hyperparameters = config[current_supergroup.value]
-        image_shape = train(list_of_models=list_of_models, current_supergroup=current_supergroup.value, config=hyperparameters, model_save_path=path_save_model, trainloader=trainloader, validationloader=testloader)
-        current_supergroup.output_image_shape = image_shape
-        trainloader.dataset.update_tree_attributes(nodes_dict) # update these attributes in the tree
-    else:
-        raise Exception("Model weights or hyper-parameters do not exist so we can't re-train")
-
-    for child in current_supergroup.children:
-        if(child.value not in trainloader.dataset.get_leaf_nodes()):
-            improve_modules_accuracy(trainloader, testloader, child)
-
 def format_time(runtime):
     """
     Output time in the format hh:mm:ss
@@ -257,30 +220,6 @@ def main():
     torch.manual_seed(config.seed)
     if(torch.cuda.is_available()):
         torch.cuda.manual_seed(config.seed)
-
-    if(args.improve_model_weights):
-        ### Improving the validation accuracy of a trained module
-        # Download datasets
-        train_dataset = GenerateDataset(args.dataset.lower(), args.model_backbone.lower(), config, train=True, re_train=True)
-        test_dataset = GenerateDataset(args.dataset.lower(), args.model_backbone.lower(), config, train=False, re_train=True)
-
-        # Create dataloaders
-        trainloader = get_dataloader(train_dataset, config, train=True, validation=False)
-        testloader = get_dataloader(test_dataset, config, train=True, validation=True)
-        
-        current_supergroup = args.improve_model_weights
-        nodes_dict = trainloader.dataset.get_dictionary_of_nodes()
-        current_node = nodes_dict[current_supergroup]
-        re_train_hyperparameters = config.retrain
-        improve_modules_accuracy(trainloader, testloader, re_train_hyperparameters, current_supergroup=current_node)
-
-        nodes_dict = trainloader.dataset.get_dictionary_of_nodes() # updated nodes_dict
-        inputs_to_model = update_inputs_for_model(nodes_dict, trainloader.dataset.image_shape)
-        with open(os.path.join(trainloader.dataset.path_to_outputs, "model_weights/inputs_to_models.json"), "w") as fptr:
-            fptr.write(json.dumps(inputs_to_model, indent=4))
-
-        end_time = time.time()
-        print(f"Finished Re-Training {args.improve_model_weights} in " + format_time(end_time - start_time))
 
     if(args.train):
         ### Training the entire tree
