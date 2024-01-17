@@ -69,7 +69,7 @@ def AverageSoftmax(list_of_models, dataloader, current_supergroup, softmax_file_
 					new_indices = indices.cpu()
 					for curr_depth in range(model_idx, 0, -1):
 						# this loop will iterate back to previous depths from the current depth to identify the images that have the right node at every depth and only preserve those images by recording only those indices
-						new_indices = indices_encountered[curr_depth - 1][new_indices]
+						new_indices = indices_encountered[curr_depth - 1][new_indices].cpu()
 					
 					indices_encountered.append(indices)
 					current_node_in_batch = target_maps_in_batch[depth][new_indices].to(device) # update this variable to only examine the images that have the right node at every depth of the path thus far
