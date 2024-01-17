@@ -37,6 +37,7 @@ def parser():
     parser = argparse.ArgumentParser(description="TRUNK for Image Classification")
     parser.add_argument("--train", action="store_true", help="Conduct training")
     parser.add_argument("--infer", action="store_true", help="Conduct inference")
+    parser.add_argument("--retrain", type=str, help="retrain a node in the tree, provide the supergroup name")
     parser.add_argument("--dataset", type=str, help="emnist, svhn, cifar10", default="emnist")
     parser.add_argument("--model_backbone", type=str, help="vgg or mobilenet", default="mobilenet")
     parser.add_argument("--debug", action="store_true", help="Print information for debugging purposes")
@@ -221,7 +222,7 @@ def main():
     if(torch.cuda.is_available()):
         torch.cuda.manual_seed(config.seed)
 
-    if(args.train):
+    if(args.train or args.retrain):
         ### Training the entire tree
         # Download datasets
         train_dataset = GenerateDataset(args.dataset.lower(), args.model_backbone.lower(), config, train=True)
@@ -236,7 +237,10 @@ def main():
         testloader = get_dataloader(test_dataset, config, train=True, validation=True)
         
         # Train supergroups
-        supergroup_queue = deque(["root"]) # queue to keep track of all the supergroups to train
+        if(args.retrain):
+            supergroup_queue = deque([args.retrain]) # queue to keep track of all the supergroups to train
+        else:
+            supergroup_queue = deque(["root"]) # queue to keep track of all the supergroups to train
 
         while(supergroup_queue):
             paths = trainloader.dataset.get_paths()
