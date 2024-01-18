@@ -17,7 +17,7 @@ device = "cuda" if torch.cuda.is_available() else "cpu"
 print(f"Device is on {device} for train.py")
 device = torch.device(device) # push the device to the gpu if gpu is available otherwise keep it on cpu
 
-loss_function = nn.NLLLoss() # loss function used to compute loss during training and validation
+# loss_function = nn.NLLLoss() # loss function used to compute loss during training and validation
 
 def get_training_details(config, current_sg_model):
     """
@@ -34,10 +34,14 @@ def get_training_details(config, current_sg_model):
     Return
     ------
     scheduler: torch.optim.lr_scheduler
+    optimizer: torch.optim
+    loss_function: torch.nn
+    epochs: int
     """
     epochs = config['epochs']
     optimizer_config = config.optimizer[0]
     scheduler_config = config.lr_scheduler[0]
+    loss_config = config.loss[0]
 
     optimizer_type = optimizer_config['type']
     params = optimizer_config.get('params', {})
@@ -49,7 +53,12 @@ def get_training_details(config, current_sg_model):
     scheduler_class = getattr(lr_scheduler, scheduler_type)
     scheduler = scheduler_class(optimizer, **params)
 
-    return scheduler, optimizer, epochs
+    loss_type = loss_config['type']
+    params = loss_config.get('params', {})
+    loss_class = getattr(nn, loss_type)
+    loss_function = loss_class(**params)
+
+    return scheduler, optimizer, loss_function, epochs
 
 
 def train(list_of_models, current_supergroup, config, model_save_path, trainloader, validationloader):
@@ -85,7 +94,7 @@ def train(list_of_models, current_supergroup, config, model_save_path, trainload
         the new shape of the feature map
     """
     # scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(optimizer, T_max=10, eta_min=0)
-    scheduler, optimizer, epochs = get_training_details(config, list_of_models[-1])
+    scheduler, optimizer, loss_function, epochs = get_training_details(config, list_of_models[-1])
     max_validation_accuracy = 0.0 # keep track of the maximum accuracy to know which model to save after conducting validation
     for epoch in range(1, epochs+1):
         count = 0 # Count the number of times we get a true positive result in a batch, used to calculate accuracy
