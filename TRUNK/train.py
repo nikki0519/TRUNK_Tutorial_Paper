@@ -17,8 +17,6 @@ device = "cuda" if torch.cuda.is_available() else "cpu"
 print(f"Device is on {device} for train.py")
 device = torch.device(device) # push the device to the gpu if gpu is available otherwise keep it on cpu
 
-# loss_function = nn.NLLLoss() # loss function used to compute loss during training and validation
-
 def get_training_details(config, current_sg_model):
     """
     Get the scheduler function based on the config file
