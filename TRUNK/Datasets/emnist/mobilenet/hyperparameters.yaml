@@ -20,6 +20,8 @@ dataset:
       num_workers: 2
       shuffle: True
 class_hyperparameters:
+  loss: 
+  - type: NLLLoss
   lr_scheduler: 
   - type: CosineAnnealingLR
     params:
@@ -32,6 +34,8 @@ class_hyperparameters:
       weight_decay: 0.0001
   epochs: 5
 grouping_hyperparameters:
+  loss: 
+  - type: NLLLoss
   grouping_volatility: 1.20
   lr_scheduler: 
   - type: CosineAnnealingLR
