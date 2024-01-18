@@ -11,6 +11,7 @@ import torch.nn as nn
 from tqdm import tqdm
 from torch.optim import lr_scheduler
 import torch.optim as optim
+import wandb
 
 ## Global Variables
 device = "cuda" if torch.cuda.is_available() else "cpu"
@@ -91,10 +92,22 @@ def train(list_of_models, current_supergroup, config, model_save_path, trainload
     feature_map_shape: tuple (BxCxHxW)
         the new shape of the feature map
     """
-    # scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(optimizer, T_max=10, eta_min=0)
     scheduler, optimizer, loss_function, epochs = get_training_details(config, list_of_models[-1])
+    run = wandb.init(
+        project="TRUNK",
+        config={
+            "architecture": current_supergroup,
+            "dataset": trainloader.dataset.dataset,
+            "epochs": epochs,
+            "learning_rate": config.optimizer[0].params.lr,
+            "weight_decay": config.optimizer[0].params.weight_decay,
+            "lr_scheduler": config.lr_scheduler[0].type
+        }
+    )
+
     max_validation_accuracy = 0.0 # keep track of the maximum accuracy to know which model to save after conducting validation
     for epoch in range(1, epochs+1):
+        running_training_loss = 0.0
         count = 0 # Count the number of times we get a true positive result in a batch, used to calculate accuracy
         total = 0 # Total number of values in a batch, used to calculate accuracy
         path_decisions = trainloader.dataset.get_path_decisions() # dictionary that stores the the path down the tree to a specific supergroup
@@ -149,10 +162,13 @@ def train(list_of_models, current_supergroup, config, model_save_path, trainload
                 sg_prediction = sg_prediction.max(1, keepdim=True)[1] # get the supergroup index prediction 
                 count += sg_prediction.eq(current_node_in_batch.view_as(sg_prediction)).sum().item() # reshape the current_node_in_batch to the shape of sg_prediction and count the number of nodes that are equal in the batch
                 total += current_node_in_batch.shape[0] # total number of nodes in the batch at the current depth
+                running_training_loss += loss
 
-                progress_bar.set_description(f"Epoch {epoch}/{epochs}, Batch {batch_idx + 1} / {len(trainloader)}, LR {scheduler.get_last_lr()[0]} - Train Loss: {loss / (batch_idx + 1)} | Train Acc: {100 * count / total} | Total Images Processed: {total}") # output the accuracy and training loss on the progress bar
-            
-        max_validation_accuracy, feature_map_size = validation(list_of_models, epoch, current_supergroup, max_validation_accuracy, model_save_path, validationloader)
+                progress_bar.set_description(f"Epoch {epoch}/{epochs}, Batch {batch_idx + 1} / {len(trainloader)}, LR {scheduler.get_last_lr()[0]} - Train Loss: {loss / (batch_idx + 1)} | Train Acc: {100 * count / total} | Total Images Processed: {total}") # output the accuracy and training loss on the progress bar    
+        max_validation_accuracy, validation_accuracy, feature_map_size = validation(list_of_models, epoch, current_supergroup, max_validation_accuracy, model_save_path, validationloader)
+        wandb.log({"train loss": running_training_loss / len(trainloader), "validation accuracy": validation_accuracy, "lr": optimizer.param_groups[0]["lr"]})
+    
+    wandb.finish()
     return feature_map_size
 
 def validation(list_of_models, epoch, current_supergroup, max_validation_accuracy, model_save_path, validationloader):
@@ -183,6 +199,9 @@ def validation(list_of_models, epoch, current_supergroup, max_validation_accurac
     ------
     max_validation_accuracy: float
         the updated max_validation_accuracy if there is an update in the accuracy of the model
+
+    validation_accuracy: float
+        the current epoch's validation accuracy
     
     images_in_batch.shape: tuple (BxCxHxW)
         the new shape of the feature map
@@ -235,9 +254,10 @@ def validation(list_of_models, epoch, current_supergroup, max_validation_accurac
         total += current_node_in_batch.shape[0] # total number of nodes in the batch at the current depth
 
     if(total > 0):
-        print(f"Validation Accuracy for supergroup {current_supergroup} at epoch {epoch}: {count / total * 100}")
+        validation_accuray = count / total * 100
+        print(f"Validation Accuracy for supergroup {current_supergroup} at epoch {epoch}: {validation_accuray}")
         if(count / total > max_validation_accuracy):
             max_validation_accuracy = count / total
             torch.save(list_of_models[-1].state_dict(), model_save_path)
 
-    return max_validation_accuracy, images_in_batch.shape
+    return max_validation_accuracy, validation_accuray, images_in_batch.shape
