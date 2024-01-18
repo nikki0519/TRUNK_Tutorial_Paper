@@ -14,7 +14,6 @@ from ResNet.resnet import resnet
 from VGG.vgg import vgg
 from ConvNeXt.convnext import convnext
 from DinoV2.dinov2 import dinov2
-from TreeCNN.treecnn import treecnn
 from MobileNet.mobilenetv2 import mobilenet
 from ViT.vit import vit
 from ResNetQuantized.resnetQuantized import resnet_quantized
@@ -145,7 +144,7 @@ def main():
 	testloader = get_dataloader(test_dataset, args.eval_batch_size, args.num_workers, shuffle=True)
 
 	# Execute the chosen model
-	model_dictionary = {"resnet": resnet, "vgg": vgg, "convnext": convnext, "dinov2": dinov2, "tree-cnn": treecnn, "mobilenet": mobilenet, "vit": vit, "resnet_quantized": resnet_quantized, "resnet_pruned": resnet_pruned}
+	model_dictionary = {"resnet": resnet, "vgg": vgg, "convnext": convnext, "dinov2": dinov2, "mobilenet": mobilenet, "vit": vit, "resnet_quantized": resnet_quantized, "resnet_pruned": resnet_pruned}
 	model_dictionary[args.model.lower()](trainloader, testloader, args.dataset) 
 
 
