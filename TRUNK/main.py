@@ -37,7 +37,9 @@ def parser():
     parser = argparse.ArgumentParser(description="TRUNK for Image Classification")
     parser.add_argument("--train", action="store_true", help="Conduct training")
     parser.add_argument("--infer", action="store_true", help="Conduct inference")
-    parser.add_argument("--retrain", type=str, help="retrain a node in the tree, provide the supergroup name")
+    parser.add_argument("--retrain", type=str, help="retrain a node in the tree, provide the supergroup name, this involves changing the groupings")
+    parser.add_argument("--resume_grouping", action="store_true", help="Start ASL and Grouping from a trained node")
+    parser.add_argument("--improve", type=str, help="improve a node's performance in the tree, provide the supergroup name")
     parser.add_argument("--dataset", type=str, help="emnist, svhn, cifar10", default="emnist")
     parser.add_argument("--model_backbone", type=str, help="vgg or mobilenet", default="mobilenet")
     parser.add_argument("--debug", action="store_true", help="Print information for debugging purposes")
@@ -190,6 +192,48 @@ def update_inputs_for_model(nodes_dict, image_shape):
     
     return dictionary_of_inputs_for_models
 
+def improve_modules_accuracy(trainloader, testloader, config, current_supergroup):
+    """
+    Improve the accuracy of the module based on the updated hyper-parameters provided in the config file but no grouping conducted
+
+    Parameters
+    ----------
+    trainloader: torch.utils.data.DataLoader
+        iterable training dataset
+
+    testloader: torch.utils.data.DataLoader
+        iterable testing dataset
+
+    config: dict
+        dictionary of re-train hyperparameters
+
+    current_supergroup: TreeNode
+        Re-training the current supergroup to improve the validation accuracy based on the new hyperparameters
+    """   
+
+    if(current_supergroup is None):
+        return
+
+    nodes_dict = trainloader.dataset.get_dictionary_of_nodes()
+    inputs_to_model = update_inputs_for_model(nodes_dict, trainloader.dataset.image_shape)
+    list_of_models = get_list_of_models_by_path(trainloader, trainloader.dataset.model_backbone, current_supergroup.value, inputs_to_model)
+    path_save_model = os.path.join(trainloader.dataset.path_to_outputs, f"model_weights/{current_supergroup.value}.pt")
+
+    if(os.path.exists(path_save_model)):
+        if(config.improve[current_supergroup.value]):
+            hyperparameters = config.improve[current_supergroup.value]
+        else:
+            hyperparameters = config.grouping_hyperparameters
+        image_shape = train(list_of_models=list_of_models, current_supergroup=current_supergroup.value, config=hyperparameters, model_save_path=path_save_model, trainloader=trainloader, validationloader=testloader)
+        current_supergroup.output_image_shape = image_shape
+        trainloader.dataset.update_tree_attributes(nodes_dict) # update these attributes in the tree
+    else:
+        raise Exception("Model weights or hyper-parameters do not exist so we can't re-train")
+
+    for child in current_supergroup.children:
+        if(child.value not in trainloader.dataset.get_leaf_nodes()):
+            improve_modules_accuracy(trainloader, testloader, child)
+
 def format_time(runtime):
     """
     Output time in the format hh:mm:ss
@@ -221,6 +265,29 @@ def main():
     torch.manual_seed(config.seed)
     if(torch.cuda.is_available()):
         torch.cuda.manual_seed(config.seed)
+
+    if(args.improve):
+        ### Improving the validation accuracy of a trained module without trying to create a new grouping pattern
+        # Download datasets
+        train_dataset = GenerateDataset(args.dataset.lower(), args.model_backbone.lower(), config, train=True, re_train=True)
+        test_dataset = GenerateDataset(args.dataset.lower(), args.model_backbone.lower(), config, train=False, re_train=True)
+
+        # Create dataloaders
+        trainloader = get_dataloader(train_dataset, config, train=True, validation=False)
+        testloader = get_dataloader(test_dataset, config, train=True, validation=True)
+        
+        current_supergroup = args.improve_model_weights
+        nodes_dict = trainloader.dataset.get_dictionary_of_nodes()
+        current_node = nodes_dict[current_supergroup]
+        improve_modules_accuracy(trainloader, testloader, config, current_supergroup=current_node)
+
+        nodes_dict = trainloader.dataset.get_dictionary_of_nodes() # updated nodes_dict
+        inputs_to_model = update_inputs_for_model(nodes_dict, trainloader.dataset.image_shape)
+        with open(os.path.join(trainloader.dataset.path_to_outputs, "model_weights/inputs_to_models.json"), "w") as fptr:
+            fptr.write(json.dumps(inputs_to_model, indent=4))
+
+        end_time = time.time()
+        print(f"Finished Re-Training {args.improve} in " + format_time(end_time - start_time))    
 
     if(args.train or args.retrain):
         ### Training the entire tree
@@ -262,8 +329,21 @@ def main():
                 break
 
             current_supergroup = supergroup_queue.popleft()
+            if(args.retrain):
+                # We would like to start fresh with the new training and after the previous training we may have landed on n number of groups 
+                # so we need to update the tree to erase the n children and leave it as m labels the node is responsible for so we do this by
+                # setting the node to un-trained status
+                nodes_dict[current_supergroup].is_trained = False
+                nodes_dict[current_supergroup].num_groups = len(nodes_dict[current_supergroup].classes)
+
+                for child in nodes_dict[current_supergroup].children:
+                    nodes_dict[child.value].parent = None
+                    del nodes_dict[child.value]
+
+                nodes_dict[current_supergroup].children = []
+                trainloader.dataset.update_tree_attributes(nodes_dict)
+
             dictionary_of_inputs_for_models = update_inputs_for_model(nodes_dict, trainloader.dataset.image_shape)
-            
             if(skip_current_node(trainloader, current_supergroup)): 
                 # check if the parent node of this current node has been trained. If not then skip
                 if(args.debug):
@@ -278,10 +358,11 @@ def main():
             list_of_models = get_list_of_models_by_path(dataloader=trainloader, model_backbone=args.model_backbone, current_supergroup=current_supergroup, dictionary_of_inputs_for_models=dictionary_of_inputs_for_models, debug_flag=args.debug)
 
             # Train the current supergroup of the MNN tree
-            print(f"Training Started on Module {current_supergroup}")
             path_save_model = os.path.join(trainloader.dataset.path_to_outputs, f"model_weights/{current_supergroup}.pt")
-            image_shape = train(list_of_models=list_of_models, current_supergroup=current_supergroup, config=config.class_hyperparameters, model_save_path=path_save_model, trainloader=trainloader, validationloader=testloader)
-            image_shape = tuple(image_shape[1:]) # change from (BxCxHxW) -> (CxHxW)
+            if((args.retrain and not args.resume_grouping) or args.train):
+                print(f"Training Started on Module {current_supergroup}")
+                image_shape = train(list_of_models=list_of_models, current_supergroup=current_supergroup, config=config.class_hyperparameters, model_save_path=path_save_model, trainloader=trainloader, validationloader=testloader)
+                image_shape = tuple(image_shape[1:]) # change from (BxCxHxW) -> (CxHxW)
 
             # Create the average softmax of this current trained supergroup
             print("Computing Average SoftMax")
