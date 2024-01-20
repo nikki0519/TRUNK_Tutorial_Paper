@@ -38,7 +38,6 @@ def parser():
     parser.add_argument("--train", action="store_true", help="Conduct training")
     parser.add_argument("--infer", action="store_true", help="Conduct inference")
     parser.add_argument("--retrain", type=str, help="retrain a node in the tree, provide the supergroup name, this involves changing the groupings")
-    parser.add_argument("--resume_grouping", action="store_true", help="Start ASL and Grouping from a trained node")
     parser.add_argument("--improve", type=str, help="improve a node's performance in the tree, provide the supergroup name")
     parser.add_argument("--dataset", type=str, help="emnist, svhn, cifar10", default="emnist")
     parser.add_argument("--model_backbone", type=str, help="vgg or mobilenet", default="mobilenet")
@@ -359,10 +358,9 @@ def main():
 
             # Train the current supergroup of the MNN tree
             path_save_model = os.path.join(trainloader.dataset.path_to_outputs, f"model_weights/{current_supergroup}.pt")
-            if(args.train or (args.retrain and not args.resume_grouping)):
-                print(f"Training Started on Module {current_supergroup}")
-                image_shape = train(list_of_models=list_of_models, current_supergroup=current_supergroup, config=config.class_hyperparameters, model_save_path=path_save_model, trainloader=trainloader, validationloader=testloader)
-                image_shape = tuple(image_shape[1:]) # change from (BxCxHxW) -> (CxHxW)
+            print(f"Training Started on Module {current_supergroup}")
+            image_shape = train(list_of_models=list_of_models, current_supergroup=current_supergroup, config=config.class_hyperparameters, model_save_path=path_save_model, trainloader=trainloader, validationloader=testloader)
+            image_shape = tuple(image_shape[1:]) # change from (BxCxHxW) -> (CxHxW)
 
             # Create the average softmax of this current trained supergroup
             print("Computing Average SoftMax")
