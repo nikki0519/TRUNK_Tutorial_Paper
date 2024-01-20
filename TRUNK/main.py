@@ -310,7 +310,6 @@ def main():
         # Train supergroups
         if(args.retrain):
             supergroup_queue = deque([args.retrain]) # queue to keep track of all the supergroups to train
-            config = config.retrain[args.retrain]
         else:
             supergroup_queue = deque(["root"]) # queue to keep track of all the supergroups to train
 
@@ -359,7 +358,14 @@ def main():
             # Train the current supergroup of the MNN tree
             path_save_model = os.path.join(trainloader.dataset.path_to_outputs, f"model_weights/{current_supergroup}.pt")
             print(f"Training Started on Module {current_supergroup}")
-            image_shape = train(list_of_models=list_of_models, current_supergroup=current_supergroup, config=config.class_hyperparameters, model_save_path=path_save_model, trainloader=trainloader, validationloader=testloader)
+
+            if(config.retrain):
+                class_hyperparameters = config.retrain.class_hyperparameters
+            elif(config[current_supergroup]):
+                class_hyperparameters = config[current_supergroup].class_hyperparameters
+            else:
+                class_hyperparameters = config.general.class_hyperparameters
+            image_shape = train(list_of_models=list_of_models, current_supergroup=current_supergroup, config=class_hyperparameters, model_save_path=path_save_model, trainloader=trainloader, validationloader=testloader)
             image_shape = tuple(image_shape[1:]) # change from (BxCxHxW) -> (CxHxW)
 
             # Create the average softmax of this current trained supergroup
@@ -370,8 +376,15 @@ def main():
 
             # Update the target_map based on the softmax of the current supergroup
             print("Updating TargetMap")
+            if(args.retrain):
+                grouping_hyperparameters = config.retrain.grouping_hyperparameters
+            elif(config[current_supergroup]):
+                grouping_hyperparameters = config[current_supergroup].grouping_hyperparameters
+            else:
+                grouping_hyperparameters = config.general.grouping_hyperparameters
+
             path_decisions = trainloader.dataset.get_path_decisions() # the paths down the tree from the root node to each supergroup
-            list_of_new_supergroups = update_target_map(trainloader, current_supergroup, config.grouping_hyperparameters['grouping_volatility'], path_to_softmax_matrix, path_decisions[current_supergroup], debug=args.debug)
+            list_of_new_supergroups = update_target_map(trainloader, current_supergroup, grouping_hyperparameters['grouping_volatility'], path_to_softmax_matrix, path_decisions[current_supergroup], debug=args.debug)
             nodes_dict = trainloader.dataset.get_dictionary_of_nodes() # updated dictionary of nodes
 
             # If there are new supergroups then add it to the end of the queue and update the dictionary_of_inputs_for_models
@@ -393,7 +406,7 @@ def main():
                 dictionary_of_inputs_for_models[current_supergroup][1] = num_children # changing the number of groups for the model to distinguish between
                 list_of_models = get_list_of_models_by_path(dataloader=trainloader, model_backbone=args.model_backbone, current_supergroup=current_supergroup, dictionary_of_inputs_for_models=dictionary_of_inputs_for_models, debug_flag=args.debug) # reset the weights of the current supergroup so we don't load its state_dict
                 
-                image_shape = train(list_of_models=list_of_models, current_supergroup=current_supergroup, config=config.grouping_hyperparameters, model_save_path=path_save_model, trainloader=trainloader, validationloader=testloader)
+                image_shape = train(list_of_models=list_of_models, current_supergroup=current_supergroup, config=grouping_hyperparameters, model_save_path=path_save_model, trainloader=trainloader, validationloader=testloader)
                 image_shape = tuple(image_shape[1:]) # change from (BxCxHxW) -> (CxHxW)
 
             nodes_dict[current_supergroup].output_image_shape = image_shape
