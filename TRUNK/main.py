@@ -359,7 +359,7 @@ def main():
 
             # Train the current supergroup of the MNN tree
             path_save_model = os.path.join(trainloader.dataset.path_to_outputs, f"model_weights/{current_supergroup}.pt")
-            if((args.retrain and not args.resume_grouping) or args.train):
+            if(args.train or (args.retrain and not args.resume_grouping)):
                 print(f"Training Started on Module {current_supergroup}")
                 image_shape = train(list_of_models=list_of_models, current_supergroup=current_supergroup, config=config.class_hyperparameters, model_save_path=path_save_model, trainloader=trainloader, validationloader=testloader)
                 image_shape = tuple(image_shape[1:]) # change from (BxCxHxW) -> (CxHxW)
