@@ -3,84 +3,124 @@ dataset:
   train:
     params:
       batch_size: 16
-      num_workers: 2
+      num_workers: 1
       shuffle: True
     transform:
-    - type: Resize
-      params:
-        size:
-        - 70
-        - 70
     - type: RandomCrop
       params:
         size:
-        - 64
-        - 64
+        - 32
+        - 32
+        padding: 4
+    - type: Resize
+      params:
+        size:
+        - 224
+        - 224
+    - type: RandomHorizontalFlip
     - type: ToTensor
     - type: Normalize
       params:
         mean:
-        - 0.485
-        - 0.456
-        - 0.406
+        - 0.4914
+        - 0.4822
+        - 0.4465
         std:
-        - 0.229
-        - 0.224
-        - 0.225
+        - 0.2023
+        - 0.1994
+        - 0.2010
   validation:
     params:
       batch_size: 16
-      num_workers: 2
+      num_workers: 1
       shuffle: True
     transform:
-    - type: Resize
-      params:
-        size:
-        - 70
-        - 70
     - type: RandomCrop
       params:
         size:
-        - 64
-        - 64
+        - 32
+        - 32
+        padding: 4
+    - type: Resize
+      params:
+        size:
+        - 224
+        - 224
+    - type: RandomHorizontalFlip
     - type: ToTensor
     - type: Normalize
       params:
         mean:
-        - 0.485
-        - 0.456
-        - 0.406
+        - 0.4914
+        - 0.4822
+        - 0.4465
         std:
-        - 0.229
-        - 0.224
-        - 0.225
+        - 0.2023
+        - 0.1994
+        - 0.2010
   test:
     params:
       batch_size: 1
-      num_workers: 2
+      num_workers: 1
       shuffle: True
-class_hyperparameters:
-  lr_scheduler: 
-  - type: CosineAnnealingLR
-    params:
-      T_max: 10
-      eta_min: 0
-  optimizer: 
-  - type: Adam
-    params:
-      lr: 0.001
-      weight_decay: 0.0001
-  epochs: 10
-grouping_hyperparameters:
-  grouping_volatility: 0.65
-  lr_scheduler: 
-  - type: CosineAnnealingLR
-    params:
-      T_max: 10
-      eta_min: 0
-  optimizer: 
-  - type: Adam
-    params:
-      lr: 0.001
-      weight_decay: 0.0005
-  epochs: 25
+general:
+  class_hyperparameters:
+    loss: 
+    - type: NLLLoss
+    lr_scheduler: 
+    - type: CosineAnnealingLR
+      params:
+        T_max: 10
+        eta_min: 0
+    optimizer: 
+    - type: Adam
+      params:
+        lr: 0.001
+        weight_decay: 0.0001
+    epochs: 10
+  grouping_hyperparameters:
+    loss: 
+    - type: NLLLoss
+    grouping_volatility: 0.85
+    lr_scheduler: 
+    - type: CosineAnnealingLR
+      params:
+        T_max: 10
+        eta_min: 0
+    optimizer: 
+    - type: Adam
+      params:
+        lr: 0.001
+        weight_decay: 0.0005
+    epochs: 60
+sg4:
+  class_hyperparameters:
+    loss: 
+    - type: NLLLoss
+    lr_scheduler: 
+    - type: CosineAnnealingLR
+      params:
+        T_max: 10
+        eta_min: 0
+    optimizer: 
+    - type: Adam
+      params:
+        lr: 0.0001
+        weight_decay: 0.0005
+    epochs: 20
+  grouping_hyperparameters:
+    loss: 
+    - type: NLLLoss
+    grouping_volatility: 0.85
+    lr_scheduler: 
+    - type: CosineAnnealingLR
+      params:
+        T_max: 10
+        eta_min: 0
+    optimizer: 
+    - type: Adam
+      params:
+        lr: 0.005
+        weight_decay: 0.0001
+    epochs: 60
+retrain:
