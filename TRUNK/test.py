@@ -24,7 +24,7 @@ from Datasets.svhn.models.VGGNet_Backbone import MNN as svhn_vgg
 ## Global Variables
 device = "cuda" if torch.cuda.is_available() else "cpu"
 print(f"Device is on {device} for test.py")
-device = torch.device(device) # push the device to the gpu if gpu is available otherwise keep it on cpu
+device = torch.device(device)
 
 def get_model(dataloader, current_supergroup):
     """
@@ -99,24 +99,23 @@ def test(testloader):
     confusion_matrix: np.array
         the confusion matrix for the chosen dataset on the trained model
     """
-    # testloader = fabric.setup_dataloaders(testloader)
     num_classes = len(testloader.dataset.labels)
     confusion_matrix = np.zeros((num_classes, num_classes))
 
-    inverse_target_map = testloader.dataset.get_inverse_target_map() # dictionary that maps the category by its path from root to leaf
-    inverse_path_decisions = testloader.dataset.get_inverse_path_decisions() # dictionary that maps the sg by its path from the root to the sg
-    leaf_nodes = testloader.dataset.get_leaf_nodes() # dictionary of all the leaf nodes in the tree and its respective paths from root node
+    inverse_target_map = testloader.dataset.get_inverse_target_map() 
+    inverse_path_decisions = testloader.dataset.get_inverse_path_decisions() 
+    leaf_nodes = testloader.dataset.get_leaf_nodes() 
 
-    num_right = 0 # number of images accurately classified
-    total = 0 # total number of images traversed
+    num_right = 0 
+    total = 0 
 
     with tqdm(enumerate(testloader), total=len(testloader), desc="Batch Idx:") as progress_bar:
         for batch_idx, (image, target_map) in progress_bar:
             image = image.to(device)
             depth = 0 # The depth or layer of the tree we're currently at for a category
-            current_node = target_map[depth].to(device) # Get the current node or supergroup we're currently at in the tree for every image in the batch based on the category of that image
+            current_node = target_map[depth].to(device) 
             path_taken = [] # path taken by the model for the current batch of images
-            model = get_model(testloader, current_supergroup="root") # Get the current supergroup model
+            model = get_model(testloader, current_supergroup="root") 
 
             while(True):
                 model.eval()
@@ -126,7 +125,7 @@ def test(testloader):
 
                 if(path_taken in list(leaf_nodes.values())):
                     # the path taken has led us down to a leaf node in the tree
-                    target_map_integer = [x.item() for x in target_map if x.item() != -1] # need to change elements of target_map from tensor to int
+                    target_map_integer = [x.item() for x in target_map if x.item() != -1] 
                     predicted_class = inverse_target_map[tuple(path_taken)]
                     target_class = inverse_target_map[tuple(target_map_integer)]
                     confusion_matrix[int(predicted_class)][int(target_class)] += 1
@@ -144,7 +143,7 @@ def test(testloader):
                 depth += 1
                 current_node = target_map[depth].to(device)
 
-            progress_bar.set_description(f"Batch Idx: {batch_idx}/{len(testloader)}") # output the current batch_idx
+            progress_bar.set_description(f"Batch Idx: {batch_idx}/{len(testloader)}") 
         print(f"Final Test Accuracy: {num_right / (total + 1e-5) * 100.0}") # we add 1e-5 to denominator to avoid dividing by 0
     return confusion_matrix
 

@@ -91,8 +91,8 @@ def get_list_of_models_by_path(dataloader, model_backbone, current_supergroup, d
         return a list of all the models involved in the path to the current supergroup
     """
 
-    paths = dataloader.dataset.get_paths() # get a dictionary mapping the paths to any supergroup from the root node
-    list_of_groups = paths[current_supergroup] # get only the modules/nodes on the path to the current supergroup
+    paths = dataloader.dataset.get_paths()
+    list_of_groups = paths[current_supergroup]
     
     list_of_models = []
     for idx, supergroup in enumerate(list_of_groups):
@@ -275,6 +275,7 @@ def main():
         trainloader = get_dataloader(train_dataset, config, train=True, validation=False)
         testloader = get_dataloader(test_dataset, config, train=True, validation=True)
         
+        # re-train this new node and its children based on the new hyperparameters
         current_supergroup = args.improve_model_weights
         nodes_dict = trainloader.dataset.get_dictionary_of_nodes()
         current_node = nodes_dict[current_supergroup]
@@ -330,7 +331,7 @@ def main():
             if(args.retrain):
                 # We would like to start fresh with the new training and after the previous training we may have landed on n number of groups 
                 # so we need to update the tree to erase the n children and leave it as m labels the node is responsible for so we do this by
-                # setting the node to un-trained status
+                # setting the node to un-trained status. This only works when this node was not grouped and divided further. 
                 nodes_dict[current_supergroup].is_trained = False
                 nodes_dict[current_supergroup].num_groups = len(nodes_dict[current_supergroup].classes)
 
@@ -359,23 +360,27 @@ def main():
             path_save_model = os.path.join(trainloader.dataset.path_to_outputs, f"model_weights/{current_supergroup}.pt")
             print(f"Training Started on Module {current_supergroup}")
 
+            ## Get training hyperparameters
             if(config.retrain):
                 class_hyperparameters = config.retrain.class_hyperparameters
             elif(config[current_supergroup]):
                 class_hyperparameters = config[current_supergroup].class_hyperparameters
             else:
                 class_hyperparameters = config.general.class_hyperparameters
+
             image_shape = train(list_of_models=list_of_models, current_supergroup=current_supergroup, config=class_hyperparameters, model_save_path=path_save_model, trainloader=trainloader, validationloader=testloader)
             image_shape = tuple(image_shape[1:]) # change from (BxCxHxW) -> (CxHxW)
 
             # Create the average softmax of this current trained supergroup
             print("Computing Average SoftMax")
-            list_of_models[-1].load_state_dict(torch.load(path_save_model)) # load the weights to the last model which is now trained
+            list_of_models[-1].load_state_dict(torch.load(path_save_model))
             path_to_softmax_matrix = os.path.join(trainloader.dataset.path_to_outputs, f"model_softmax/{current_supergroup}_avg_softmax.pt")
             AverageSoftmax(list_of_models, trainloader, current_supergroup, path_to_softmax_matrix)
 
             # Update the target_map based on the softmax of the current supergroup
             print("Updating TargetMap")
+
+            ## Get supergroup training hyperparameters 
             if(args.retrain):
                 grouping_hyperparameters = config.retrain.grouping_hyperparameters
             elif(config[current_supergroup]):
@@ -383,7 +388,7 @@ def main():
             else:
                 grouping_hyperparameters = config.general.grouping_hyperparameters
 
-            path_decisions = trainloader.dataset.get_path_decisions() # the paths down the tree from the root node to each supergroup
+            path_decisions = trainloader.dataset.get_path_decisions() # the paths down the tree from the root node to each node in the tree
             list_of_new_supergroups = update_target_map(trainloader, current_supergroup, grouping_hyperparameters['grouping_volatility'], path_to_softmax_matrix, path_decisions[current_supergroup], debug=args.debug)
             nodes_dict = trainloader.dataset.get_dictionary_of_nodes() # updated dictionary of nodes
 
@@ -394,17 +399,16 @@ def main():
                     print(f"List of Supergroups to still train: {supergroup_queue}")
             supergroup_queue = deque([sg for sg in supergroup_queue if sg in list(nodes_dict.keys())]) # update the queue to remove supergroups that have been grouped with other supergroups
 
-            # Re-train the current supergroup on the number of children it has rather than the number of classes 
+            # Re-train the current supergroup to distinguish betweeen the number of children it has rather than the number of classes 
             node = nodes_dict[current_supergroup]
-            num_children = node.num_groups # the number of children the node has
-            num_classes = len(node.classes) # the number of categories from the dataset the node is responsible for
+            num_children = node.num_groups 
+            num_classes = len(node.classes) 
             
             print(f"For the current supergroup: {current_supergroup}, they have {num_classes} labels and {num_children} children with an image shape of {dictionary_of_inputs_for_models[current_supergroup][0]}")
             if(num_children != num_classes):
-                # Then this node must be re-trained to only distinguish between the number of children nodes and not categories
                 print(f"Re-training on the current supergroup {current_supergroup} with number of children: {num_children}")
                 dictionary_of_inputs_for_models[current_supergroup][1] = num_children # changing the number of groups for the model to distinguish between
-                list_of_models = get_list_of_models_by_path(dataloader=trainloader, model_backbone=args.model_backbone, current_supergroup=current_supergroup, dictionary_of_inputs_for_models=dictionary_of_inputs_for_models, debug_flag=args.debug) # reset the weights of the current supergroup so we don't load its state_dict
+                list_of_models = get_list_of_models_by_path(dataloader=trainloader, model_backbone=args.model_backbone, current_supergroup=current_supergroup, dictionary_of_inputs_for_models=dictionary_of_inputs_for_models, debug_flag=args.debug) # reset the weights of the current supergroup
                 
                 image_shape = train(list_of_models=list_of_models, current_supergroup=current_supergroup, config=grouping_hyperparameters, model_save_path=path_save_model, trainloader=trainloader, validationloader=testloader)
                 image_shape = tuple(image_shape[1:]) # change from (BxCxHxW) -> (CxHxW)

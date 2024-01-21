@@ -25,6 +25,18 @@ class TreeNode:
 
     classes: list
         list of dataset categories that belong to this node
+
+    children: list
+        the list of children this node is a parent to
+
+    num_groups: int
+        number of children this node has
+
+    output_image_shape: tuple
+        the output image shape that comes out of this node
+
+    is_trained: bool
+        flag to let us know if the node has been trained or not
     """
 
     def __init__(self, value, parent, classes=[], num_groups=0):
@@ -41,13 +53,13 @@ class TreeNode:
             list of classes from the dataset that correspond to this new node     
         """
 
-        self.value = value # The value of the node
-        self.classes = classes # Number of classes or labels associated with this node
-        self.parent = parent # the parent node for this new child
-        self.children = [] # List of the current node's children
-        self.num_groups = num_groups # Number of children or groups this node has
-        self.output_image_shape = () # The output image shape to this current node
-        self.is_trained = False # flag to check if the node is trained or not 
+        self.value = value 
+        self.classes = classes 
+        self.parent = parent 
+        self.children = [] 
+        self.num_groups = num_groups 
+        self.output_image_shape = () 
+        self.is_trained = False  
 
     def depth_of_tree(self):
         """
@@ -100,8 +112,8 @@ def create_value_for_node(nodes_dict, node):
         # If this value doesn't already exist in the dictionary of all the nodes of the tree, then return this value for the new child node
         return value
 
-    group_numbers = [int(get_group_number(group_name)) for group_name in list(nodes_dict.keys()) if group_name != "root"] # Get a list of group number among all the nodes
-    return "sg" + str(int(max(group_numbers) + 1)) # Return a value that is one larger than the largest group number in the list of group numbers
+    group_numbers = [int(get_group_number(group_name)) for group_name in list(nodes_dict.keys()) if group_name != "root"]
+    return "sg" + str(int(max(group_numbers) + 1))
 
 def build_tree_from_input(target_map, nodes_dict):
     """
@@ -125,30 +137,29 @@ def build_tree_from_input(target_map, nodes_dict):
         if(value != "root"):
             node.classes = []
 
-    root = nodes_dict['root'] # the root node of the tree
+    root = nodes_dict['root']
 
     # Iterate through the target_map to build the tree
     for label, path in target_map.items():
-        node = root # The current parent node
-        for idx in path: # iterate through the path for the current category
+        node = root 
+        for idx in path: 
             if(idx == -1):
                 # -1 is used for padding so we want to omit this in the tree build
                 continue
             else:
-                if idx >= len(node.children): # if the current idx-th child node exceeds the number of children this parent node already has, create a new child node
-                    child_value = create_value_for_node(nodes_dict, node) # get a value to assign to this child node
-                    child = TreeNode(value=child_value, parent=node, classes=[]) # create the child node
-                    node.children.append(child) # append this new child to the list of children the parent node has
-                    node.num_groups += 1 # increment the number of children the node has
+                if idx >= len(node.children): 
+                    child_value = create_value_for_node(nodes_dict, node) 
+                    child = TreeNode(value=child_value, parent=node, classes=[]) 
+                    node.children.append(child) 
+                    node.num_groups += 1
                 else:
                     child = node.children[idx] 
 
                 if(label not in child.classes):
-                    # If label for this node doesn't exist, add it to the list of labels this node is responsible for
                     child.classes.append(label) 
 
-                node = child # let the new parent node be the current child node
-                nodes_dict[child.value] = child # add this new node to the dictionary of all the nodes in the tree
+                node = child 
+                nodes_dict[child.value] = child 
 
     return nodes_dict
 
@@ -167,7 +178,7 @@ def build_path_decisions(nodes_dict):
         dictionary mapping of every supergroup/node and the path down to it from the root nodes
     """
 
-    path_decisions = {} # dictionary mapping the path down to each supergroup/node from the root node
+    path_decisions = {} 
 
     def dfs(node, path_indices):
         """
@@ -264,7 +275,7 @@ def load_tree_from_file(path):
     """
 
     with open(path, 'rb') as fptr:
-        root = pickle.load(fptr) # the root node of the tree
+        root = pickle.load(fptr) 
 
     def build_nodes_dict_from_saved_tree(node, nodes_dict):
         """
@@ -285,7 +296,6 @@ def load_tree_from_file(path):
         """
 
         if node is None:
-            # edge case when there is no node, return back recursively
             return
         
         nodes_dict[node.value] = node
@@ -311,8 +321,8 @@ def get_path_decisions(path_to_tree):
         dictionary that maps the path down to the supergroups from the root node where the list is the index positions in the tree
     """
 
-    nodes = load_tree_from_file(path_to_tree) # load the tree which is saved from the pickle file
-    path_decisions = build_path_decisions(nodes) # create the dictionary mapping the path down to supergroups from the root node (path from root but the list is the index positions of nodes)
+    nodes = load_tree_from_file(path_to_tree) 
+    path_decisions = build_path_decisions(nodes)
 
     return path_decisions
 
@@ -331,7 +341,7 @@ def get_leaf_nodes(path_to_tree):
         dictionary of leaf nodes and its respective path from the root node using path decisions
     """
 
-    nodes = load_tree_from_file(path_to_tree) # load the tree which is saved from the pickle file
+    nodes = load_tree_from_file(path_to_tree) 
     path_decisions = get_path_decisions(path_to_tree)
 
     leafs = {}
@@ -430,8 +440,8 @@ def get_paths(path_to_tree):
         dictionary that maps the path down to the supergroups from the root node where the list are the node values
     """
 
-    nodes = load_tree_from_file(path_to_tree) # load the tree which is saved from the pickle file
-    paths = build_path_values(nodes) # create the dictionary mapping the path down to supergroups from the root node 
+    nodes = load_tree_from_file(path_to_tree) 
+    paths = build_path_values(nodes) 
 
     return paths
 
@@ -458,11 +468,12 @@ def update_tree(path_to_tree, target_map, current_supergroup=None, path_to_weigh
         nodes = {'root': TreeNode(value='root', parent=None, classes=list(target_map.keys()), num_groups=len(target_map))} # create the root node and add it to the dictionary of nodes (nodes_dict)
 
     else:
-        nodes = load_tree_from_file(path_to_tree) # load the tree which is saved from the pickle file
-        nodes = build_tree_from_input(target_map, nodes) # update the tree given the information from the target_map and the pickle file we just loaded from
+        nodes = load_tree_from_file(path_to_tree) 
+        nodes = build_tree_from_input(target_map, nodes) 
         nodes = remove_nodes_with_empty_classes(nodes) # some nodes will end up with no class so we will remove this
 
         if(path_to_weights):
+            # update the number of supergroup children the nodes has after grouping
             nodes = update_number_groups(current_supergroup, path_to_weights, nodes)
 
     write_tree_to_file(nodes['root'], path_to_tree) # write the new tree to the originally saved file (path from root but the list is the value of nodes)
@@ -488,8 +499,8 @@ def remove_nodes_with_empty_classes(nodes_dict):
 
     Parameters
     ----------
-    nodes_dict:
-        dictionary of nodes
+    nodes_dict: dict
+        dictionary of the nodes in the tree
     
     Return
     ------
@@ -524,8 +535,8 @@ def get_num_classes_per_sg(path_to_tree):
         dictionary mapping each node and the number of classes they are responsible for
     """
 
-    nodes = load_tree_from_file(path_to_tree) # load the tree which is saved from the pickle file
-    num_class_per_sg = {} # dictionary mapping each node and the number of categories they are responsible for (key, value) = (node value, number of categories)
+    nodes = load_tree_from_file(path_to_tree) 
+    num_class_per_sg = {}
 
     for node_value, node in nodes.items():
         num_class_per_sg[node_value] = len(node.classes)

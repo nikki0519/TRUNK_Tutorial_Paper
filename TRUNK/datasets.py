@@ -85,16 +85,16 @@ class GenerateDataset(torch.utils.data.Dataset):
 			if re_train, then we want to re-train a specific module in the tree
 		"""
 
-		self.dataset = dataset # Argument from user: emnist or svhn or cifar10?
-		self.model_backbone = model_backbone # Argument from user: vgg or mobilenet, needed for path
-		self.data = load_dataset(self.dataset, config, train) # Load the torchvision dataset
-		self.max_depth = 1 # Current maximum depth of the tree 
+		self.dataset = dataset 
+		self.model_backbone = model_backbone 
+		self.data = load_dataset(self.dataset, config, train) 
+		self.max_depth = 1 
 
 		self.image_shape = tuple(self.data[0][0].shape) # Get the shape of the image in the dataset (CxHxW)
 		if(self.dataset == "svhn"):
 			self.labels = list(set(self.data.labels))
 		else:
-			self.labels = self.data.classes # List of unique classes in the dataset
+			self.labels = self.data.classes 
 
 		self.path_to_outputs = os.path.join("./Datasets", self.dataset) # Path to save outputs for particular dataset used
 		self.path_to_outputs = os.path.join(self.path_to_outputs, self.model_backbone)
@@ -102,11 +102,10 @@ class GenerateDataset(torch.utils.data.Dataset):
 		if(train and not re_train):
 			# Initialize a target_map and record it (description of target_map in the get_target_map function)
 			target_map = {idx: [idx] for idx in range(len(self.labels))}
-			path_to_target_map = os.path.join(self.path_to_outputs, "target_map.json") # Path to save target map
+			path_to_target_map = os.path.join(self.path_to_outputs, "target_map.json") 
 			with open(path_to_target_map, "w") as fptr:
 				fptr.write(json.dumps(target_map, indent=4))
 
-			# Initialize and save the tree structure (description of tree is in pathDecisions.py)
 			self.update_tree()
 		
 	def get_target_map(self):
@@ -130,7 +129,7 @@ class GenerateDataset(torch.utils.data.Dataset):
 			dictionary that maps the path from the root to each class label
 		"""
 
-		path_to_target_map = os.path.join(self.path_to_outputs, "target_map.json") # Path to save target map
+		path_to_target_map = os.path.join(self.path_to_outputs, "target_map.json") 
 		fptr = open(path_to_target_map, "r")
 		return json.load(fptr)
 	
@@ -285,11 +284,7 @@ class GenerateDataset(torch.utils.data.Dataset):
 			the updated dictionary that maps the path down the tree from the root node to its respective classID leafs
 		"""
 
-		path_to_target_map = os.path.join(self.path_to_outputs, "target_map.json") # Path to save target map
-		# nodes_dict = self.get_dictionary_of_nodes()
-		# self.max_depth = nodes_dict["root"].depth_of_tree()
-
-		# padded_target_map = self.padding_target_map(target_map)
+		path_to_target_map = os.path.join(self.path_to_outputs, "target_map.json")
 		with open(path_to_target_map, "w") as fptr:
 			fptr.write(json.dumps(target_map, indent=4))
 
@@ -389,7 +384,7 @@ class GenerateDataset(torch.utils.data.Dataset):
 			the path from the root to the image's class leaf in the tree
 		"""
 
-		self.target_map = self.get_target_map() # get the updated and most recent target_map stored in the json file
+		self.target_map = self.get_target_map()
 		image, target = self.data[idx][0], self.target_map[str(self.data[idx][1])] # Note: self.data[idx] = (image, classID)
 		return image, target
 

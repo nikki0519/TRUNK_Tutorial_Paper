@@ -39,57 +39,49 @@ def AverageSoftmax(list_of_models, dataloader, current_supergroup, softmax_file_
 		the path to the softmax file
 	"""
 
-	path_decisions = dataloader.dataset.get_path_decisions() # get the path decisions for each supergroup from the root down the tree
-	number_of_classes_in_dataset = len(dataloader.dataset.labels) # number of classes in the entire dataset
-	number_of_classes_grouped = list_of_models[-1].number_of_classes # the number of supergroups
+	path_decisions = dataloader.dataset.get_path_decisions() 
+	number_of_classes_in_dataset = len(dataloader.dataset.labels)
+	number_of_classes_grouped = list_of_models[-1].number_of_classes 
 
 	softmax_matrix = torch.zeros((number_of_classes_grouped, number_of_classes_grouped)).to(device) # softmax matrix that will record the softmax values among the different supergroups
-	counts = [0 for idx in range(number_of_classes_grouped)] # total number of predictions that were the same
+	counts = [0 for idx in range(number_of_classes_grouped)]
 	with torch.no_grad():
 		for batch_idx, (images_in_batch, target_maps_in_batch) in enumerate(dataloader):
-			images_in_batch = images_in_batch.to(device) # the images in the current batch
+			images_in_batch = images_in_batch.to(device) 
 			depth = 0 # The depth of the tree we're currently at for a category
-			current_node_in_batch = target_maps_in_batch[depth].to(device) # current node we are currently on in the tree at the current depth for all the images in the batch
-			indices_encountered = [] # Collect the list of indices of the images in the batch that have the corresponding correct next child based on the current supergroup model we're at
-			noBatch = False # If none of the images in the batch have the right paths predicted, then set noBatch=True so that we can skip this batch
-
-			"""
-			This loop in line 57  iterates through the list of models to identify whether current_node_in_batch which is given by target_map 
-			is the same as the true node at the current depth of the path from root to the current supergroup as determined by path_decisions. 
-			The current_node_in_batch and true node is updated by incrementing depth by one and model_idx corresponds with depth.
-			"""
+			current_node_in_batch = target_maps_in_batch[depth].to(device) 
+			indices_encountered = [] 
+			noBatch = False 
 
 			for model_idx in range(len(list_of_models) - 1):
 				images_in_batch, _ = list_of_models[model_idx].evaluate(images_in_batch)
 				true_node_idx = path_decisions[current_supergroup][depth]
 				depth += 1
 
-				indices = torch.nonzero(current_node_in_batch == true_node_idx)[:,0] # identify all the images in the batch that have the same node as the node identified as by path_decisions at the current depth and record its indices 
-				if(len(indices) > 0): # check if there are images whose predicted nodes from the target_map match the true node
+				indices = torch.nonzero(current_node_in_batch == true_node_idx)[:,0]  
+				if(len(indices) > 0): 
 					new_indices = indices.cpu()
 					for curr_depth in range(model_idx, 0, -1):
-						# this loop will iterate back to previous depths from the current depth to identify the images that have the right node at every depth and only preserve those images by recording only those indices
 						new_indices = indices_encountered[curr_depth - 1][new_indices].cpu()
 					
 					indices_encountered.append(indices)
-					current_node_in_batch = target_maps_in_batch[depth][new_indices].to(device) # update this variable to only examine the images that have the right node at every depth of the path thus far
-					images_in_batch = images_in_batch[indices] # only consider the images that have the right node indicated by target_map at this current depth 
+					current_node_in_batch = target_maps_in_batch[depth][new_indices].to(device)
+					images_in_batch = images_in_batch[indices]
 				
 				else:
-					noBatch = True # if no images in the batch are ground-truth images, then set noBatch to True so that we can skip this batch during training
+					noBatch = True
 					break
 
 			if(noBatch or images_in_batch.shape[0] == 0):
-				# skip this batch if no ground-truth images are identified for training and computing loss
 				continue
 			
-			images_in_batch, predictions = list_of_models[depth](images_in_batch) # get a prediction of what the next node is at the current depth
-			predictions = nn.functional.softmax(predictions, dim=1) # create a softmax of the tensor of predictions
+			images_in_batch, predictions = list_of_models[depth](images_in_batch) 
+			predictions = nn.functional.softmax(predictions, dim=1) 
 			for supergroup in range(number_of_classes_grouped):
 				indices = torch.nonzero(current_node_in_batch == supergroup)[:, 0] # gather the indices of the images in the batch that have the same supergroup index
 				hold = predictions[indices] # only keep the predictions that were the same
 				softmax_matrix[supergroup] += hold.sum(dim=0) # add the total softmax of all the same predictions to the softmax group for the current supergroup
-				counts[supergroup] += hold.shape[0] # total number of predictions that were the same
+				counts[supergroup] += hold.shape[0] 
 
 	for idx in range(number_of_classes_grouped):
 		if(counts[idx] != 0):
@@ -382,8 +374,8 @@ def update_target_map(dataloader, current_supergroup, grouping_volatility, path_
 		updated = set(updated_path_decisions.keys())
 		return list(previous.symmetric_difference(updated))
 
-	super_group_list = ModelVisualSimilarityMetric(dataloader, current_supergroup, grouping_volatility, path_to_softmax_matrix, debug) # get a list of the next supergroups for this current supergroup
-	previous_nodes_dict = dataloader.dataset.get_dictionary_of_nodes() # the current dictionary of nodes
+	super_group_list = ModelVisualSimilarityMetric(dataloader, current_supergroup, grouping_volatility, path_to_softmax_matrix, debug) 
+	previous_nodes_dict = dataloader.dataset.get_dictionary_of_nodes()
 	if(len(super_group_list) == 1):
 		# Don't create any new children if there are no sub-groups to be made
 		print(f"No new children made for supergroup {current_supergroup}")
@@ -391,13 +383,13 @@ def update_target_map(dataloader, current_supergroup, grouping_volatility, path_
 		dataloader.dataset.update_tree_attributes(previous_nodes_dict) # update these attributes in the tree
 		return []
 	
-	previous_target_map = dataloader.dataset.get_target_map() # the current target_map
-	previous_path_decisions = dataloader.dataset.get_path_decisions() # the current path_decisions
+	previous_target_map = dataloader.dataset.get_target_map()
+	previous_path_decisions = dataloader.dataset.get_path_decisions()
 	
-	updated_target_map = copy.deepcopy(previous_target_map) # create a copy of the current target_map to update
-	categories_that_belong_to_super_group = find_categories_beloning_to_sg(updated_target_map) # focus on only the class labels that belong to the current supergroup
-	checked_categories = [] # add all the categories we checked in the loop here so we can skip them
-	supergroup_id = 0 # the id of the next child or supergroup node to the current supergroup we are examining
+	updated_target_map = copy.deepcopy(previous_target_map) 
+	categories_that_belong_to_super_group = find_categories_beloning_to_sg(updated_target_map) 
+	checked_categories = []
+	supergroup_id = 0 # the id of the next child or supergroup node child of the current supergroup we are examining
 	
 	# iterate through the supergroup_list and examine each new supergroup
 	for supergroup in super_group_list:
@@ -405,7 +397,6 @@ def update_target_map(dataloader, current_supergroup, grouping_volatility, path_
 		for category_encoding, path_to_sg in categories_that_belong_to_super_group.items():
 			path_to_sg = remove_padding_from_path(path_to_sg)
 			if(category_encoding in checked_categories):
-				# skip this category if we already checked it 
 				pass
 
 			elif(path_to_sg[-1] in supergroup): # if the category is in this new supergroup
@@ -417,15 +408,15 @@ def update_target_map(dataloader, current_supergroup, grouping_volatility, path_
 					path_to_sg[-2] = supergroup_id # change the second to last index in the path to accomodate for the new supergroup introduced
 					id_within_supergroup += 1 # increment the id_within_supergroup to accomodate for another category that may belong to this new supergroup
 
-				checked_categories.append(category_encoding) # add the category we checked to the list so we can pass it next time
-				updated_target_map[category_encoding] = path_to_sg # add the updated path to the target_map for this category
+				checked_categories.append(category_encoding) 
+				updated_target_map[category_encoding] = path_to_sg 
 
-		supergroup_id += 1 # increment the supergroup_id so that we can focus on the next new supergroup or child of the current supergroup we are examining
+		supergroup_id += 1
 	
-	dataloader.dataset.update_target_map(updated_target_map) # write to file the new target_map
-	dataloader.dataset.update_tree(current_supergroup) # update the tree to include new supergroups
-	dataloader.dataset.padding_target_map() # pad the target map based on the new depth
-	updated_path_decisions = dataloader.dataset.get_path_decisions() # now that target map and tree are updated and written to file, get the updated path decisions
+	dataloader.dataset.update_target_map(updated_target_map)
+	dataloader.dataset.update_tree(current_supergroup) 
+	dataloader.dataset.padding_target_map()
+	updated_path_decisions = dataloader.dataset.get_path_decisions()
 
 	list_of_new_supergroups = new_supergroups()
 	for new_sg in list_of_new_supergroups:

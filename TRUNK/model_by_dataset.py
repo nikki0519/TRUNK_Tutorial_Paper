@@ -18,7 +18,7 @@ import torch
 ## Global Variables
 device = "cuda" if torch.cuda.is_available() else "cpu"
 print(f"Device is on {device} for model_by_dataset.py")
-device = torch.device(device) # push the device to the gpu if gpu is available otherwise keep it on cpu
+device = torch.device(device)
 
 def get_model(dataloader, model_backbone, number_of_classes, image_shape, current_supergroup, supergroup="root", debug_flag=True):
     """
