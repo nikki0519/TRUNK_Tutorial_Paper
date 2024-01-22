@@ -95,7 +95,7 @@ def train(list_of_models, current_supergroup, config, model_save_path, trainload
     scheduler, optimizer, loss_function, epochs = get_training_details(config, list_of_models[-1])
     # Log metrics on Weights and Biases Platform
     run = wandb.init(
-        project="TRUNK",
+        project=f"TRUNK-{trainloader.dataset.dataset}",
         config={
             "architecture": current_supergroup,
             "dataset": trainloader.dataset.dataset,
