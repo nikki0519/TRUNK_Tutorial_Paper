@@ -99,6 +99,7 @@ def train(list_of_models, current_supergroup, config, model_save_path, trainload
         config={
             "architecture": current_supergroup,
             "dataset": trainloader.dataset.dataset,
+            "grouping_volatility": config['grouping_volatility'] if "grouping_volatility" in config else "-",
             "epochs": epochs,
             "learning_rate": config.optimizer[0].params.lr,
             "weight_decay": config.optimizer[0].params.weight_decay,
