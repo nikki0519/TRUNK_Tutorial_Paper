@@ -97,7 +97,6 @@ def get_list_of_models_by_path(dataloader, model_backbone, current_supergroup, d
     list_of_models = []
     for idx, supergroup in enumerate(list_of_groups):
         image_shape, num_classes = dictionary_of_inputs_for_models[supergroup]
-        print(f"Image Shape: {image_shape}, Num Classes: {num_classes}")
         model = get_model(dataloader=dataloader, model_backbone=model_backbone.lower(), number_of_classes=num_classes, image_shape=image_shape, current_supergroup=current_supergroup, supergroup=supergroup, debug_flag=debug_flag)
         list_of_models.append(model)
     return list_of_models
