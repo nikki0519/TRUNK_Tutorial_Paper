@@ -361,7 +361,7 @@ def main():
 
             ## Get training hyperparameters
             if(config.retrain):
-                class_hyperparameters = config.retrain.class_hyperparameters
+                class_hyperparameters = config.retrain[current_supergroup].class_hyperparameters
             elif(current_supergroup in config):
                 class_hyperparameters = config[current_supergroup].class_hyperparameters
             else:
@@ -381,7 +381,7 @@ def main():
 
             ## Get supergroup training hyperparameters 
             if(args.retrain):
-                grouping_hyperparameters = config.retrain.grouping_hyperparameters
+                grouping_hyperparameters = config.retrain[current_supergroup].grouping_hyperparameters
             elif(current_supergroup in config):
                 grouping_hyperparameters = config[current_supergroup].grouping_hyperparameters
             else:
