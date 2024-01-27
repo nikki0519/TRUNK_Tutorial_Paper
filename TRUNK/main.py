@@ -358,10 +358,12 @@ def main():
             # Train the current supergroup of the MNN tree
             path_save_model = os.path.join(trainloader.dataset.path_to_outputs, f"model_weights/{current_supergroup}.pt")
             print(f"Training Started on Module {current_supergroup}")
-
             ## Get training hyperparameters
             if(config.retrain):
-                class_hyperparameters = config.retrain[current_supergroup].class_hyperparameters
+                if(current_supergroup in config.retrain):
+                    class_hyperparameters = config.retrain[current_supergroup].class_hyperparameters
+                else:
+                    class_hyperparameters = config.general.class_hyperparameters
             elif(current_supergroup in config):
                 class_hyperparameters = config[current_supergroup].class_hyperparameters
             else:
@@ -378,10 +380,12 @@ def main():
 
             # Update the target_map based on the softmax of the current supergroup
             print("Updating TargetMap")
-
             ## Get supergroup training hyperparameters 
             if(args.retrain):
-                grouping_hyperparameters = config.retrain[current_supergroup].grouping_hyperparameters
+                if(current_supergroup in config.retrain):
+                    grouping_hyperparameters = config.retrain[current_supergroup].grouping_hyperparameters
+                else:
+                    grouping_hyperparameters = config.general.grouping_hyperparameters
             elif(current_supergroup in config):
                 grouping_hyperparameters = config[current_supergroup].grouping_hyperparameters
             else:
