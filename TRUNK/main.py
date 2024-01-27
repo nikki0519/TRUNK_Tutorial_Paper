@@ -39,8 +39,8 @@ def parser():
     parser.add_argument("--infer", action="store_true", help="Conduct inference")
     parser.add_argument("--retrain", type=str, help="retrain a node in the tree, provide the supergroup name, this involves changing the groupings")
     parser.add_argument("--improve", type=str, help="improve a node's performance in the tree, provide the supergroup name")
-    parser.add_argument("--dataset", type=str, help="emnist, svhn, cifar10", default="emnist")
-    parser.add_argument("--model_backbone", type=str, help="vgg or mobilenet", default="mobilenet")
+    parser.add_argument("--dataset", type=str, help="emnist, svhn, cifar10", choices=["emnist", "svhn", "cifar10"], default="emnist")
+    parser.add_argument("--model_backbone", type=str, help="vgg or mobilenet", choices=["vgg", "mobilenet"], default="mobilenet")
     parser.add_argument("--debug", action="store_true", help="Print information for debugging purposes")
     args = parser.parse_args()
     return args
