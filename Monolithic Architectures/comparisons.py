@@ -14,10 +14,10 @@ from ResNet.resnet import resnet
 from VGG.vgg import vgg
 from ConvNeXt.convnext import convnext
 from DinoV2.dinov2 import dinov2
+from DeIT.deit import deit
 from MobileNet.mobilenetv2 import mobilenet
 from ViT.vit import vit
 from ResNetQuantized.resnetQuantized import resnet_quantized
-from ResNetPruned.resnetPruned import resnet_pruned
 
 def parser():
 	"""
@@ -30,10 +30,10 @@ def parser():
 	"""
 	parser = argparse.ArgumentParser(description="Comparing other Image Classification Models")
 	parser.add_argument("--train_batch_size", type=int, help="Training Batch Size", default=8)
-	parser.add_argument("--eval_batch_size", type=int, help="Evaluation Batch Size", default=8)
+	parser.add_argument("--eval_batch_size", type=int, help="Evaluation Batch Size", default=1)
 	parser.add_argument("--num_workers", type=int, help="Number of parallel workers for dataloader", default=0)
-	parser.add_argument("--dataset", type=str, help="EMNIST, SVHN, CIFAR-10", default="emnist")
-	parser.add_argument("--model", type=str, help="choose between resnet, vgg, mobilenet, tree-cnn, convnet, ViT, Dinov2, resnet_quantized, resnet_pruned", default="resnet")
+	parser.add_argument("--dataset", type=str, help="EMNIST, SVHN, CIFAR-10", choices=["emnist", "svhn", "cifar10"], default="emnist")
+	parser.add_argument("--model", type=str, help="choose between resnet, vgg, resnet_quantized, mobilenet, convnet, vit, dinov2, deit", choices=["resnet", "vgg", "resnet_quantized", "mobilenet", "convnext", "vit", "dinov2", "deit"], default="resnet")
 	args = parser.parse_args()
 	return args
 	
@@ -144,7 +144,7 @@ def main():
 	testloader = get_dataloader(test_dataset, args.eval_batch_size, args.num_workers, shuffle=True)
 
 	# Execute the chosen model
-	model_dictionary = {"resnet": resnet, "vgg": vgg, "convnext": convnext, "dinov2": dinov2, "mobilenet": mobilenet, "vit": vit, "resnet_quantized": resnet_quantized, "resnet_pruned": resnet_pruned}
+	model_dictionary = {"resnet": resnet, "resnet_quantized": resnet_quantized, "vgg": vgg, "convnext": convnext, "dinov2": dinov2, "mobilenet": mobilenet, "vit": vit, "deit": deit}
 	model_dictionary[args.model.lower()](trainloader, testloader, args.dataset) 
 
 
