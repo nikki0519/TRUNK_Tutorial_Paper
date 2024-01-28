@@ -236,8 +236,8 @@ def resnet_pruned(trainloader, testloader, dataset):
     epochs, learning_rate, betas, weight_decay = get_hyperparameters(dataset)
     pruned_resnet = get_pruned_model(dataset, num_classes)
 
-    # training_loss = train(model=pruned_resnet, trainloader=trainloader, epochs=epochs, learning_rate=learning_rate, betas=betas, weight_decay=weight_decay, save_to_path=path_to_model_weights)
-    # plot_losses(loss=training_loss, epochs=epochs, dataset=dataset, path="ResNetPruned/")
+    training_loss = train(model=pruned_resnet, trainloader=trainloader, epochs=epochs, learning_rate=learning_rate, betas=betas, weight_decay=weight_decay, save_to_path=path_to_model_weights)
+    plot_losses(loss=training_loss, epochs=epochs, dataset=dataset, path="ResNetPruned/")
 
     confusion_matrix, accuracy = test(model=pruned_resnet, path_to_network=path_to_model_weights, testloader=testloader, num_classes=num_classes)
     print(f"Validation Accuracy for Pruned ResNet-50: {accuracy}")

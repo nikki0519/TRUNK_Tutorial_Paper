@@ -123,7 +123,7 @@ def test(model, path_to_network, testloader, num_classes):
 
 def get_model(dataset, num_classes):
     """
-    Get the Pre-Trained DinoV2 Model
+    Get the Pre-Trained DeIT Model
 
     Parameters
     ----------
@@ -215,8 +215,8 @@ def deit(trainloader, testloader, dataset):
     epochs, learning_rate, betas, weight_decay = get_hyperparameters(dataset)
     deit = get_model(dataset, num_classes)
 
-    # training_loss = train(model=deit, trainloader=trainloader, epochs=epochs, learning_rate=learning_rate, betas=betas, weight_decay=weight_decay, save_to_path=path_to_model_weights)
-    # plot_losses(loss=training_loss, epochs=epochs, dataset=dataset, path="DeIT/")
+    training_loss = train(model=deit, trainloader=trainloader, epochs=epochs, learning_rate=learning_rate, betas=betas, weight_decay=weight_decay, save_to_path=path_to_model_weights)
+    plot_losses(loss=training_loss, epochs=epochs, dataset=dataset, path="DeIT/")
 
     confusion_matrix, accuracy = test(model=deit, path_to_network=path_to_model_weights, testloader=testloader, num_classes=num_classes)
     print(f"Validation Accuracy for DeIT: {accuracy}")
