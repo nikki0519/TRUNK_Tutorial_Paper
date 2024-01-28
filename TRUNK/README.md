@@ -7,7 +7,13 @@ The Datasets directory is further divided into the three folderes representing t
 
 The architecture design varies by the different datasets used and is inspired by the [MobileNetv2][1] and [VGG-16][2] networks. The pre-trained weights are available for the MobileNet inspired architecture. The networks for each dataset are found in Datasets/dataset name/models
 
-The data (EMNIST, CiFAR10, and SVHN) used to train and test the TRUNK model will be downloaded from torchvision when executing the main.py script as shown below
+The data (EMNIST, CiFAR10, and SVHN) used to train and test the TRUNK model will be downloaded from torchvision when executing the main.py script as demonstrated in the training section. We have also provided the SHA-1 checksum of our datasets:
+
+| Dataset Name | SHA-1 Checksum |
+|--------------|----------------|
+| EMNIST | 943e9bb542928ec2f44d85d97e59761bb93aef80   |
+| CIFAR-10 | da39a3ee5e6b4b0d3255bfef95601890afd80709  |
+| SVHN | da39a3ee5e6b4b0d3255bfef95601890afd80709    |
 
 ## Training
 To train TRUNK in the paper for a particular dataset, run this command:
