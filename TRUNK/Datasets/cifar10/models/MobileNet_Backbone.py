@@ -87,6 +87,60 @@ class MNN(nn.Module):
 			layers.append(InvertedResidual(ch_in=32, ch_out=64, width_multiplier=2, stride=1))
 			layers.append(InvertedResidual(ch_in=64, ch_out=64, width_multiplier=4, stride=1))
 
+		elif(supergroup == "sg5"):
+			layers.append(nn.Conv2d(in_channels=input_channel, out_channels=128, kernel_size=3, stride=2, padding=1))
+			layers.append(nn.BatchNorm2d(num_features=128))
+			layers.append(nn.ReLU6(inplace=True))
+			###
+			layers.append(nn.Conv2d(in_channels=128, out_channels=64, kernel_size=3, stride=2, padding=1))
+			layers.append(nn.BatchNorm2d(num_features=64))
+			layers.append(nn.ReLU6(inplace=True))
+			###
+			layers.append(InvertedResidual(ch_in=64, ch_out=128, width_multiplier=8, stride=1))
+			layers.append(InvertedResidual(ch_in=128, ch_out=128, width_multiplier=4, stride=1))
+			layers.append(InvertedResidual(ch_in=128, ch_out=256, width_multiplier=8, stride=1))
+			layers.append(InvertedResidual(ch_in=256, ch_out=256, width_multiplier=4, stride=1))
+			layers.append(InvertedResidual(ch_in=256, ch_out=256, width_multiplier=2, stride=1))
+			layers.append(InvertedResidual(ch_in=256, ch_out=512, width_multiplier=8, stride=1))
+			layers.append(InvertedResidual(ch_in=512, ch_out=512, width_multiplier=2, stride=1))
+			###
+			layers.append(nn.Conv2d(in_channels=512, out_channels=1024, kernel_size=3, stride=2, padding=1))
+			layers.append(nn.BatchNorm2d(num_features=1024))
+			layers.append(nn.ReLU6(inplace=True))
+			###
+			layers.append(nn.Conv2d(in_channels=1024, out_channels=512, kernel_size=3, stride=1, padding=1))
+			layers.append(nn.BatchNorm2d(num_features=512))
+			layers.append(nn.ReLU6(inplace=True))
+
+		elif(supergroup == "sg15"):
+			layers.append(nn.Conv2d(in_channels=input_channel, out_channels=256, kernel_size=3, stride=2, padding=1))
+			layers.append(nn.BatchNorm2d(num_features=256))
+			layers.append(nn.ReLU6(inplace=True))
+			###
+			layers.append(nn.Conv2d(in_channels=256, out_channels=128, kernel_size=3, stride=2, padding=1))
+			layers.append(nn.BatchNorm2d(num_features=128))
+			layers.append(nn.ReLU6(inplace=True))
+			###
+			layers.append(nn.Conv2d(in_channels=128, out_channels=64, kernel_size=3, stride=2, padding=1))
+			layers.append(nn.BatchNorm2d(num_features=64))
+			layers.append(nn.ReLU6(inplace=True))
+			###
+			layers.append(InvertedResidual(ch_in=64, ch_out=128, width_multiplier=8, stride=1))
+			layers.append(InvertedResidual(ch_in=128, ch_out=128, width_multiplier=4, stride=1))
+			layers.append(InvertedResidual(ch_in=128, ch_out=256, width_multiplier=8, stride=1))
+			layers.append(InvertedResidual(ch_in=256, ch_out=256, width_multiplier=4, stride=1))
+			layers.append(InvertedResidual(ch_in=256, ch_out=256, width_multiplier=2, stride=1))
+			layers.append(InvertedResidual(ch_in=256, ch_out=512, width_multiplier=8, stride=1))
+			layers.append(InvertedResidual(ch_in=512, ch_out=512, width_multiplier=2, stride=1))
+			###
+			layers.append(nn.Conv2d(in_channels=512, out_channels=1024, kernel_size=3, stride=2, padding=1))
+			layers.append(nn.BatchNorm2d(num_features=1024))
+			layers.append(nn.ReLU6(inplace=True))
+			###
+			layers.append(nn.Conv2d(in_channels=1024, out_channels=512, kernel_size=3, stride=1, padding=1))
+			layers.append(nn.BatchNorm2d(num_features=512))
+			layers.append(nn.ReLU6(inplace=True))
+
 		else: # Every other supergroup
 			layers.append(nn.Conv2d(in_channels=input_channel, out_channels=64, kernel_size=3, stride=2, padding=1))
 			layers.append(nn.BatchNorm2d(num_features=64))
