@@ -219,11 +219,11 @@ def improve_modules_accuracy(trainloader, testloader, config, current_supergroup
 
     if(os.path.exists(path_save_model)):
         if(config.improve[current_supergroup.value]):
-            hyperparameters = config.improve[current_supergroup.value]
+            hyperparameters = config.improve[current_supergroup.value].grouping_hyperparameters
         else:
-            hyperparameters = config.grouping_hyperparameters
+            hyperparameters = config.general.grouping_hyperparameters
         image_shape = train(list_of_models=list_of_models, current_supergroup=current_supergroup.value, config=hyperparameters, model_save_path=path_save_model, trainloader=trainloader, validationloader=testloader)
-        current_supergroup.output_image_shape = image_shape
+        nodes_dict[current_supergroup.value].output_image_shape = image_shape
         trainloader.dataset.update_tree_attributes(nodes_dict) # update these attributes in the tree
     else:
         raise Exception("Model weights or hyper-parameters do not exist so we can't re-train")
@@ -275,7 +275,7 @@ def main():
         testloader = get_dataloader(test_dataset, config, train=True, validation=True)
         
         # re-train this new node and its children based on the new hyperparameters
-        current_supergroup = args.improve_model_weights
+        current_supergroup = args.improve
         nodes_dict = trainloader.dataset.get_dictionary_of_nodes()
         current_node = nodes_dict[current_supergroup]
         improve_modules_accuracy(trainloader, testloader, config, current_supergroup=current_node)
