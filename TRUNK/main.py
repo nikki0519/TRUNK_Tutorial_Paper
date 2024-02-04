@@ -359,7 +359,7 @@ def main():
             path_save_model = os.path.join(trainloader.dataset.path_to_outputs, f"model_weights/{current_supergroup}.pt")
             print(f"Training Started on Module {current_supergroup}")
             ## Get training hyperparameters
-            if(config.retrain):
+            if(args.retrain):
                 if(current_supergroup in config.retrain):
                     class_hyperparameters = config.retrain[current_supergroup].class_hyperparameters
                 else:
