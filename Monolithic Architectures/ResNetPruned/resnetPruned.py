@@ -158,12 +158,11 @@ def get_pruned_model(dataset, num_classes):
         (resnet_50.fc, 'weight'),
     ]
 
-    for _ in range(3):                          #simplistic iterative pruning to increase pruning
-        prune.global_unstructured(
-        parameters_to_prune,
-        pruning_method=prune.L1Unstructured,
-        amount=0.3,                             #pruning percentage set to 30%
-        )
+    prune.global_unstructured(
+    parameters_to_prune,
+    pruning_method=prune.L1Unstructured,
+    amount=0.3,                             #pruning percentage set to 30%
+    )
 
     return resnet_50
     
