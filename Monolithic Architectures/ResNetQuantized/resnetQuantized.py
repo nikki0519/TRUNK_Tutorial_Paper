@@ -7,7 +7,7 @@
 
 # Import necessary libraries
 from torchvision.models import resnet50
-from torch.ao.quantization import QuantStub, DeQuantStub, fuse_modules, get_default_qconfig, prepare_qat, convert
+from torch.ao.quantization import QuantStub, DeQuantStub, fuse_modules, get_default_qconfig, prepare_qat
 import torch.nn as nn
 import torch
 import numpy as np
@@ -175,8 +175,8 @@ def get_model(dataset, num_classes, path_to_saved_model):
         
     Return
     ------
-    quantized: torchvision.models
-        quantized resnet-50 models
+    resnet_50: torchvision.models
+        resnet_50 resnet-50 models
     """
 
     resnet_50 = resnet50(pretrained=True)
