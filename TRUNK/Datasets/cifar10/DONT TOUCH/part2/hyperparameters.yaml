@@ -1,0 +1,309 @@
+seed: 42
+dataset:
+  train:
+    params:
+      batch_size: 16
+      num_workers: 1
+      shuffle: True
+    transform:
+    - type: RandomCrop
+      params:
+        size:
+        - 32
+        - 32
+        padding: 4
+    - type: Resize
+      params:
+        size:
+        - 224
+        - 224
+    - type: RandomHorizontalFlip
+    - type: ToTensor
+    - type: Normalize
+      params:
+        mean:
+        - 0.4914
+        - 0.4822
+        - 0.4465
+        std:
+        - 0.2023
+        - 0.1994
+        - 0.2010
+  validation:
+    params:
+      batch_size: 16
+      num_workers: 1
+      shuffle: True
+    transform:
+    - type: RandomCrop
+      params:
+        size:
+        - 32
+        - 32
+        padding: 4
+    - type: Resize
+      params:
+        size:
+        - 224
+        - 224
+    - type: RandomHorizontalFlip
+    - type: ToTensor
+    - type: Normalize
+      params:
+        mean:
+        - 0.4914
+        - 0.4822
+        - 0.4465
+        std:
+        - 0.2023
+        - 0.1994
+        - 0.2010
+  test:
+    params:
+      batch_size: 1
+      num_workers: 1
+      shuffle: True
+root:
+  class_hyperparameters:
+    loss: 
+    - type: NLLLoss
+    lr_scheduler: 
+    - type: CosineAnnealingLR
+      params:
+        T_max: 10
+        eta_min: 0
+    optimizer: 
+    - type: Adam
+      params:
+        lr: 0.001
+        weight_decay: 0.0001
+    epochs: 10
+  grouping_hyperparameters:
+    loss: 
+    - type: NLLLoss
+    grouping_volatility: 0.88
+    lr_scheduler: 
+    - type: CosineAnnealingLR
+      params:
+        T_max: 10
+        eta_min: 0
+    optimizer: 
+    - type: Adam
+      params:
+        lr: 0.001
+        weight_decay: 0.0005
+    epochs: 45
+general:
+  class_hyperparameters:
+    loss: 
+    - type: NLLLoss
+    lr_scheduler: 
+    - type: CosineAnnealingLR
+      params:
+        T_max: 10
+        eta_min: 0
+    optimizer: 
+    - type: AdamW
+      params:
+        lr: 0.0005
+        weight_decay: 0.0005
+    epochs: 120
+  grouping_hyperparameters:
+    loss: 
+    - type: NLLLoss
+    grouping_volatility: 1.20
+    lr_scheduler: 
+    - type: CosineAnnealingLR
+      params:
+        T_max: 10
+        eta_min: 0
+    optimizer: 
+    - type: AdamW
+      params:
+        lr: 0.0002
+        weight_decay: 0.0005
+    epochs: 120
+sg4:
+  class_hyperparameters:
+    loss: 
+    - type: NLLLoss
+    lr_scheduler: 
+    - type: CosineAnnealingLR
+      params:
+        T_max: 10
+        eta_min: 0
+    optimizer: 
+    - type: Adam
+      params:
+        lr: 0.0001
+        weight_decay: 0.0005
+    epochs: 12
+  grouping_hyperparameters:
+    loss: 
+    - type: NLLLoss
+    grouping_volatility: 0.78
+    lr_scheduler: 
+    - type: CosineAnnealingLR
+      params:
+        T_max: 10
+        eta_min: 0
+    optimizer: 
+    - type: Adam
+      params:
+        lr: 0.0001
+        weight_decay: 0.0005
+    epochs: 60
+sg3:
+  class_hyperparameters:
+    loss: 
+    - type: NLLLoss
+    lr_scheduler: 
+    - type: CosineAnnealingLR
+      params:
+        T_max: 10
+        eta_min: 0
+    optimizer: 
+    - type: Adam
+      params:
+        lr: 0.0002
+        weight_decay: 0.0005
+    epochs: 120
+  grouping_hyperparameters:
+    loss: 
+    - type: NLLLoss
+    grouping_volatility: 0.65
+    lr_scheduler: 
+    - type: CosineAnnealingLR
+      params:
+        T_max: 10
+        eta_min: 0
+    optimizer: 
+    - type: Adam
+      params:
+        lr: 0.0002
+        weight_decay: 0.0005
+    epochs: 120
+sg1:
+  class_hyperparameters:
+    loss: 
+    - type: NLLLoss
+    lr_scheduler: 
+    - type: CosineAnnealingLR
+      params:
+        T_max: 10
+        eta_min: 0
+    optimizer: 
+    - type: Adam
+      params:
+        lr: 0.0002
+        weight_decay: 0.0005
+    epochs: 15
+  grouping_hyperparameters:
+    loss: 
+    - type: NLLLoss
+    grouping_volatility: 0.65
+    lr_scheduler: 
+    - type: CosineAnnealingLR
+      params:
+        T_max: 30
+        eta_min: 0
+    optimizer: 
+    - type: Adam
+      params:
+        lr: 0.0002
+        weight_decay: 0.0005
+    epochs: 120
+sg2:
+  class_hyperparameters:
+    loss: 
+    - type: NLLLoss
+    lr_scheduler: 
+    - type: CosineAnnealingLR
+      params:
+        T_max: 30
+        eta_min: 0
+    optimizer: 
+    - type: Adam
+      params:
+        lr: 0.0002
+        weight_decay: 0.0005
+    epochs: 120
+  grouping_hyperparameters:
+    loss: 
+    - type: NLLLoss
+    grouping_volatility: 0.65
+    lr_scheduler: 
+    - type: CosineAnnealingLR
+      params:
+        T_max: 10
+        eta_min: 0
+    optimizer: 
+    - type: Adam
+      params:
+        lr: 0.0002
+        weight_decay: 0.0005
+    epochs: 120
+retrain:
+  sg2:
+    class_hyperparameters:
+      loss: 
+      - type: NLLLoss
+      lr_scheduler: 
+      - type: CosineAnnealingLR
+        params:
+          T_max: 30
+          eta_min: 0
+      optimizer: 
+      - type: Adam
+        params:
+          lr: 0.0002
+          weight_decay: 0.0005
+      epochs: 120
+    grouping_hyperparameters:
+      loss: 
+      - type: NLLLoss
+      grouping_volatility: 0.65
+      lr_scheduler: 
+      - type: CosineAnnealingLR
+        params:
+          T_max: 10
+          eta_min: 0
+      optimizer: 
+      - type: Adam
+        params:
+          lr: 0.0002
+          weight_decay: 0.0005
+      epochs: 120
+improve:
+  sg5:
+    grouping_hyperparameters:
+      loss: 
+      - type: NLLLoss
+      grouping_volatility: 1.20
+      lr_scheduler: 
+      - type: CosineAnnealingLR
+        params:
+          T_max: 10
+          eta_min: 0
+      optimizer: 
+      - type: Adam
+        params:
+          lr: 0.0001
+          weight_decay: 0.0005
+      epochs: 120
+  sg6:
+    grouping_hyperparameters:
+      loss: 
+      - type: NLLLoss
+      grouping_volatility: 1.20
+      lr_scheduler: 
+      - type: CosineAnnealingLR
+        params:
+          T_max: 10
+          eta_min: 0
+      optimizer: 
+      - type: Adam
+        params:
+          lr: 0.0001
+          weight_decay: 0.0005
+      epochs: 120
