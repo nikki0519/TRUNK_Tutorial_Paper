@@ -435,11 +435,13 @@ def load_dataset(dataset, config, train=False):
 	
 	transform_config = config.dataset.train.transform
 	transform = build_transforms(transform_config)
+	# path_to_data = "../data"
+	path_to_data = "/scratch/gilbreth/ravi30/data"
 	
 	if(train):
 		if(dataset == "emnist"):
 				return datasets.EMNIST(
-								root="../data/train",
+								root=f"{path_to_data}/train",
 								split="balanced",
 								train=True,
 								download=True,
@@ -447,13 +449,13 @@ def load_dataset(dataset, config, train=False):
 						)
 		
 		elif(dataset == "svhn"):
-				return datasets.SVHN(root="../data/train/",
+				return datasets.SVHN(root=f"{path_to_data}/train/",
 								split="train",
 								download=True,
 								transform=transform)
 		
 		elif(dataset == "cifar10"):
-			return datasets.CIFAR10(root="../data/train/", 
+			return datasets.CIFAR10(root=f"{path_to_data}/train/", 
 									 train=True, 
 									 download=True, 
 									 transform=transform)
@@ -461,20 +463,20 @@ def load_dataset(dataset, config, train=False):
 	else:
 		if(dataset == "emnist"):
 			return datasets.EMNIST(
-							root="../data/test/",
+							root=f"{path_to_data}/test/",
 							split="balanced",
 							train=False,
 							download=True,
 							transform=transform)
 
 		elif(dataset == "svhn"):
-			return datasets.SVHN(root="../data/test/",
+			return datasets.SVHN(root=f"{path_to_data}/test/",
 								split="test",
 								download=True,
 								transform=transform)
 		
 		elif(dataset == "cifar10"):
-			return datasets.CIFAR10(root="../data/test/", 
+			return datasets.CIFAR10(root=f"{path_to_data}/test/", 
 									train=False, 
 									download=True, 
 									transform=transform)
