@@ -542,3 +542,19 @@ def get_num_classes_per_sg(path_to_tree):
         num_class_per_sg[node_value] = len(node.classes)
 
     return num_class_per_sg
+
+if __name__ == "__main__":
+    path = r"/home/ravi30/TRUNK_Tutorial_Paper/TRUNK/Datasets/cifar10/mobilenet/tree.pkl"
+    # path = "/home/ravi30/TRUNK_Tutorial_Paper/TRUNK/Datasets/cifar10/DONT TOUCH/tree copy.pkl"
+    tree = load_tree_from_file(path)
+
+    sgs = {}
+    for value, node in tree.items():
+        if(len(node.classes) > 1):
+            sgs[value] = node
+
+    for value, node in sgs.items():
+        if(value != "root"):
+            print(f"For node {value} its children are {[child.value for child in node.children]}, its classes are {node.classes}, and its parent is {node.parent.value}")
+        else:
+            print(f"For node {value} its children are {[child.value for child in node.children]}, its classes are {node.classes}")
