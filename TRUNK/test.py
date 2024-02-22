@@ -98,6 +98,9 @@ def test(testloader):
     ------
     confusion_matrix: np.array
         the confusion matrix for the chosen dataset on the trained model
+
+    accuracy: float
+        Accuracy evaluated using the testing dataset
     """
     num_classes = len(testloader.dataset.labels)
     confusion_matrix = np.zeros((num_classes, num_classes))
@@ -143,9 +146,12 @@ def test(testloader):
                 depth += 1
                 current_node = target_map[depth].to(device)
 
-            progress_bar.set_description(f"Batch Idx: {batch_idx}/{len(testloader)}") 
-        print(f"Final Test Accuracy: {num_right / (total + 1e-5) * 100.0}") # we add 1e-5 to denominator to avoid dividing by 0
-    return confusion_matrix
+            progress_bar.set_description(f"Batch Idx: {batch_idx}/{len(testloader)}")
+
+        accuracy = num_right / (total + 1e-5) * 100.0 # we add 1e-5 to denominator to avoid dividing by 0
+        print(f"Final Test Accuracy: {accuracy}") 
+
+    return confusion_matrix, accuracy
 
 def display_confusion_matrix(confusion_matrix, testloader):
     """
@@ -170,3 +176,27 @@ def display_confusion_matrix(confusion_matrix, testloader):
     plt.ylabel("Predicted Label")
 
     plt.savefig(f'{path}/confusion_matrix.png')
+
+def ablation_study(grouping_volatilities, accuracies, testloader):
+    """
+    Graph the inference accuracy obtained for each grouping volatility if using the CIFAR-10 dataset
+
+    Parameters
+    ----------
+    grouping_volatilities: list
+        list of grouping volatilities
+
+    accuracies: list
+        list of inference accuracies obtained on the testing dataset
+
+    testloader: torch.utils.data.DataLoader
+        iterable test dataset
+    """
+
+    plt.plot(grouping_volatilities, accuracies, marker='o', color='red')
+    plt.title('Analyzing the effects of the grouping volatility which structures the tree on the testing accuracy')
+    plt.xlabel('Grouping Volatility')
+    plt.ylabel('Inference Accuracy [%]')
+
+    path = testloader.dataset.path_to_outputs
+    plt.savefig(f'{path}/ablation_study.png')
