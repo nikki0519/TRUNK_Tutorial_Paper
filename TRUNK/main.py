@@ -226,7 +226,7 @@ def main():
         if(args.dataset.lower() == "svhn" or args.dataset.lower() == "emnist"):
             list_of_grouping_volatilities = [config.general.grouping_hyperparameters['grouping_volatility']]
         else:
-            list_of_grouping_volatilities = [idx/100 for idx in range(int(0.10*100), int(1.20*100), 1)]
+            list_of_grouping_volatilities = [idx/100 for idx in range(int(0.50*100), int(1.20*100), 1)]
 
         for grouping_idx, grouping_volatility in enumerate(list_of_grouping_volatilities):
             print(f"Current Grouping Volatility is {grouping_volatility}")
@@ -284,7 +284,7 @@ def main():
                 else:
                     class_hyperparameters = config.general.class_hyperparameters
 
-                image_shape = train(list_of_models=list_of_models, current_supergroup=current_supergroup, config=class_hyperparameters, model_save_path=path_save_model, trainloader=trainloader, validationloader=testloader)
+                image_shape = train(list_of_models=list_of_models, current_supergroup=current_supergroup, config=class_hyperparameters, grouping_volatility=grouping_volatility, model_save_path=path_save_model, trainloader=trainloader, validationloader=testloader)
                 image_shape = tuple(image_shape[1:]) # change from (BxCxHxW) -> (CxHxW)
 
                 # Create the average softmax of this current trained supergroup
@@ -327,7 +327,7 @@ def main():
                     dictionary_of_inputs_for_models[current_supergroup][1] = num_children # changing the number of groups for the model to distinguish between
                     list_of_models = get_list_of_models_by_path(dataloader=trainloader, model_backbone=args.model_backbone, current_supergroup=current_supergroup, dictionary_of_inputs_for_models=dictionary_of_inputs_for_models, debug_flag=args.debug) # reset the weights of the current supergroup
                     
-                    image_shape = train(list_of_models=list_of_models, current_supergroup=current_supergroup, config=grouping_hyperparameters, model_save_path=path_save_model, trainloader=trainloader, validationloader=testloader)
+                    image_shape = train(list_of_models=list_of_models, current_supergroup=current_supergroup, config=grouping_hyperparameters, grouping_volatility=grouping_volatility, model_save_path=path_save_model, trainloader=trainloader, validationloader=testloader)
                     image_shape = tuple(image_shape[1:]) # change from (BxCxHxW) -> (CxHxW)
 
                 nodes_dict[current_supergroup].output_image_shape = image_shape
@@ -350,7 +350,7 @@ def main():
         if(args.dataset.lower() == "svhn" or args.dataset.lower() == "emnist"):
             list_of_grouping_volatilities = [config.general.grouping_hyperparameters['grouping_volatility']]
         else:
-            list_of_grouping_volatilities = [idx/100 for idx in range(int(0.10*100), int(1.20*100), 1)]
+            list_of_grouping_volatilities = [idx/100 for idx in range(int(0.50*100), int(1.20*100), 1)]
 
         for grouping_idx, grouping_volatility in enumerate(list_of_grouping_volatilities):
             print(f"Current Grouping Volatility is {grouping_volatility}")
