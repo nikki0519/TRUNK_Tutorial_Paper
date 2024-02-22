@@ -224,7 +224,7 @@ def main():
         ### Training the entire tree
         # Iterate through grouping volatilities for an ablation study
         if(args.dataset.lower() == "svhn" or args.dataset.lower() == "emnist"):
-            list_of_grouping_volatilities = [grouping_hyperparameters['grouping_volatility']]
+            list_of_grouping_volatilities = [config.general.grouping_hyperparameters['grouping_volatility']]
         else:
             list_of_grouping_volatilities = [idx/100 for idx in range(int(0.10*100), int(1.20*100), 1)]
 
@@ -348,7 +348,7 @@ def main():
 
         # Iterate through grouping volatilities for an ablation study
         if(args.dataset.lower() == "svhn" or args.dataset.lower() == "emnist"):
-            list_of_grouping_volatilities = [grouping_hyperparameters['grouping_volatility']]
+            list_of_grouping_volatilities = [config.general.grouping_hyperparameters['grouping_volatility']]
         else:
             list_of_grouping_volatilities = [idx/100 for idx in range(int(0.10*100), int(1.20*100), 1)]
 
