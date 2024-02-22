@@ -111,7 +111,7 @@ general:
   grouping_hyperparameters:
     loss: 
     - type: NLLLoss
-    grouping_volatility: 1.20
+    grouping_volatility: 0.70
     lr_scheduler: 
     - type: CosineAnnealingLR
       params:
