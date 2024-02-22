@@ -60,7 +60,7 @@ def get_training_details(config, current_sg_model):
     return scheduler, optimizer, loss_function, epochs
 
 
-def train(list_of_models, current_supergroup, config, model_save_path, trainloader, validationloader):
+def train(list_of_models, current_supergroup, config, grouping_volatility, model_save_path, trainloader, validationloader):
     """
     Train the current supergroup module
 
@@ -77,6 +77,9 @@ def train(list_of_models, current_supergroup, config, model_save_path, trainload
 
     config: dict
         dictionary containing information on the hyperparameters and training regime
+
+    grouping_volatility: float
+        the factor used in the ASL calculation and plays a role in how the tree is structured
 
     model_save_path: str
         the path to save the trained supergroup module
@@ -100,7 +103,7 @@ def train(list_of_models, current_supergroup, config, model_save_path, trainload
         config={
             "architecture": current_supergroup,
             "dataset": trainloader.dataset.dataset,
-            "grouping_volatility": config['grouping_volatility'] if "grouping_volatility" in config else "-",
+            "grouping_volatility": grouping_volatility,
             "epochs": epochs,
             "learning_rate": config.optimizer[0].params.lr,
             "weight_decay": config.optimizer[0].params.weight_decay,
