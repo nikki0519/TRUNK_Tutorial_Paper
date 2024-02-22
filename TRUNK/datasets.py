@@ -37,6 +37,9 @@ class GenerateDataset(torch.utils.data.Dataset):
 	labels: list
 		list of all the unique classes in the dataset
 
+	grouping_volatility: float
+		the factor used in the ASL calculation
+
 	path_to_outputs: str
 		the path to where we store all our outputs (i.e. target_map, path_decisions, etc.)
 
@@ -65,7 +68,7 @@ class GenerateDataset(torch.utils.data.Dataset):
 		get a dictionary of class IDs and their respective labels
 	"""
 
-	def __init__(self, dataset, model_backbone, config, train=False, re_train=False):
+	def __init__(self, dataset, model_backbone, config, grouping_volatility, train=False):
 		"""
 		Parameters
 		----------
@@ -78,17 +81,18 @@ class GenerateDataset(torch.utils.data.Dataset):
 		config: dict
 			dictionary of training regime
 
+		grouping_volatility: float
+			the factor used in the ASL calculation and plays a role in how the TRUNK tree is structured
+
 		train: bool
 			train is true, if we want to create a training dataset and train is false if we want to create a testing dataset
-
-		re_train: bool
-			if re_train, then we want to re-train a specific module in the tree
 		"""
 
 		self.dataset = dataset 
 		self.model_backbone = model_backbone 
-		self.data = load_dataset(self.dataset, config, train) 
+		self.data = load_dataset(self.dataset, config, train)
 		self.max_depth = 1 
+		self.grouping_volatility = grouping_volatility
 
 		self.image_shape = tuple(self.data[0][0].shape) # Get the shape of the image in the dataset (CxHxW)
 		if(self.dataset == "svhn"):
@@ -98,15 +102,26 @@ class GenerateDataset(torch.utils.data.Dataset):
 
 		self.path_to_outputs = os.path.join("./Datasets", self.dataset) # Path to save outputs for particular dataset used
 		self.path_to_outputs = os.path.join(self.path_to_outputs, self.model_backbone)
+		self.path_to_outputs = os.path.join(self.path_to_outputs, str(self.grouping_volatility))
 
-		if(train and not re_train):
-			# Initialize a target_map and record it (description of target_map in the get_target_map function)
-			target_map = {idx: [idx] for idx in range(len(self.labels))}
-			path_to_target_map = os.path.join(self.path_to_outputs, "target_map.json") 
-			with open(path_to_target_map, "w") as fptr:
-				fptr.write(json.dumps(target_map, indent=4))
+		# Create this directory if it doesn't exist
+		if(not os.path.exists(self.path_to_outputs)):
+			os.makedirs(self.path_to_outputs)
 
-			self.update_tree()
+		if(train):
+			self.initialize_files()
+
+	def initialize_files(self):
+		"""
+		Initialize a target_map and record it (description of target_map in the get_target_map function)
+
+		"""
+		target_map = {idx: [idx] for idx in range(len(self.labels))}
+		path_to_target_map = os.path.join(self.path_to_outputs, "target_map.json") 
+		with open(path_to_target_map, "w") as fptr:
+			fptr.write(json.dumps(target_map, indent=4))
+
+		self.update_tree()
 		
 	def get_target_map(self):
 		"""
