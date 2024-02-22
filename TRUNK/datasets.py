@@ -38,7 +38,7 @@ class GenerateDataset(torch.utils.data.Dataset):
 		list of all the unique classes in the dataset
 
 	grouping_volatility: float
-		the factor used in the ASL calculation
+		the factor used in the ASL calculation and plays a role in how the tree is structured
 
 	path_to_outputs: str
 		the path to where we store all our outputs (i.e. target_map, path_decisions, etc.)
@@ -102,7 +102,10 @@ class GenerateDataset(torch.utils.data.Dataset):
 
 		self.path_to_outputs = os.path.join("./Datasets", self.dataset) # Path to save outputs for particular dataset used
 		self.path_to_outputs = os.path.join(self.path_to_outputs, self.model_backbone)
-		self.path_to_outputs = os.path.join(self.path_to_outputs, str(self.grouping_volatility))
+
+		if(self.dataset == "cifar10"):
+			# This is because we are conducting an ablation study for cifar10
+			self.path_to_outputs = os.path.join(self.path_to_outputs, str(self.grouping_volatility))
 
 		# Create this directory if it doesn't exist
 		if(not os.path.exists(self.path_to_outputs)):
