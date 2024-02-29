@@ -102,6 +102,7 @@ def train(list_of_models, current_supergroup, config, grouping_volatility, model
         project=f"TRUNK-{trainloader.dataset.dataset}",
         config={
             "architecture": current_supergroup,
+            "backbone": trainloader.dataset.model_backbone,
             "dataset": trainloader.dataset.dataset,
             "grouping_volatility": grouping_volatility,
             "epochs": epochs,
