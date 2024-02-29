@@ -18,6 +18,7 @@ import torch
 import json
 import time
 from omegaconf import OmegaConf
+import numpy as np
 
 # Global Variables
 device = "cuda" if torch.cuda.is_available() else "cpu"
@@ -219,6 +220,7 @@ def main():
 
     ## set seed
     torch.manual_seed(config.seed)
+    np.random.seed(config.seed)
     if(torch.cuda.is_available()):
         torch.cuda.manual_seed(config.seed)
 
