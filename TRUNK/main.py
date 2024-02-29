@@ -39,6 +39,8 @@ def parser():
     parser.add_argument("--infer", action="store_true", help="Conduct inference")
     parser.add_argument("--dataset", type=str, help="emnist, svhn, cifar10", choices=["emnist", "svhn", "cifar10"], default="emnist")
     parser.add_argument("--model_backbone", type=str, help="vgg or mobilenet", choices=["vgg", "mobilenet"], default="mobilenet")
+    parser.add_argument("--grouping_volatility", action="store_true", help="If this is set true, then we will use the grouping volatility indicated in the config file")
+    parser.add_argument("--ablation_study", nargs=3, type=float, help="the starting, ending grouping volatilites, and its increment step. We study the impact of this range of coefficients on the testing accuracy.")
     parser.add_argument("--debug", action="store_true", help="Print information for debugging purposes")
     args = parser.parse_args()
     return args
@@ -223,10 +225,10 @@ def main():
     if(args.train):
         ### Training the entire tree
         # Iterate through grouping volatilities for an ablation study
-        if(args.dataset.lower() == "svhn" or args.dataset.lower() == "emnist"):
+        if(args.grouping_volatility):
             list_of_grouping_volatilities = [config.general.grouping_hyperparameters['grouping_volatility']]
         else:
-            list_of_grouping_volatilities = [idx/100 for idx in range(int(0.50*100), int(1.20*100), 1)]
+            list_of_grouping_volatilities = [idx/100 for idx in range(int(args.ablation_study[0]*100), int(args.ablation_study[1]*100), int(args.ablation_study[2]*100))]
 
         for grouping_idx, grouping_volatility in enumerate(list_of_grouping_volatilities):
             print(f"Current Grouping Volatility is {grouping_volatility}")
@@ -347,10 +349,10 @@ def main():
         list_of_accuracies = []
 
         # Iterate through grouping volatilities for an ablation study
-        if(args.dataset.lower() == "svhn" or args.dataset.lower() == "emnist"):
+        if(args.grouping_volatility):
             list_of_grouping_volatilities = [config.general.grouping_hyperparameters['grouping_volatility']]
         else:
-            list_of_grouping_volatilities = [idx/100 for idx in range(int(0.50*100), int(1.20*100), 1)]
+            list_of_grouping_volatilities = [idx/100 for idx in range(int(args.ablation_study[0]*100), int(args.ablation_study[1]*100), args.ablation_study[2]*100)]
 
         for grouping_idx, grouping_volatility in enumerate(list_of_grouping_volatilities):
             print(f"Current Grouping Volatility is {grouping_volatility}")
