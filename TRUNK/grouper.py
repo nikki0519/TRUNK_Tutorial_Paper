@@ -115,7 +115,8 @@ def transitive_grouper(similar_groups):
 					similar_groups_dict[category1].append(category2)
 				if(category1 not in similar_groups_dict[category2]):
 					similar_groups_dict[category2].append(category1)
-
+					
+	# If category "A" is similar to category "B" and category "B" is similar to category "C". Then category "A" and "C" should be grouped together along with "B" into same SG in the hierarchy.
 	for category in similar_groups_dict:
 		for similar_category in similar_groups_dict[category]:
 			for similar_to_similar_category in similar_groups_dict[similar_category]:
@@ -172,7 +173,8 @@ def create_supergroup_list_helper(number_of_classes, grouping_volatility, avg_so
 		similar_groups.append([idx])
 		for jdx in range(idx, number_of_classes):
 			prob = SigmoidMembership(number_of_classes, grouping_volatility, avg_softmax_matrix[idx][jdx])
-			if((np.random.choice(2, 100000, p = [1 - prob, prob]).mean() > 0.5) and (idx != jdx)):
+			# Determine if the expected value that two classes are visually similar is greater than 50%
+			if((np.random.choice(2, 10000, p = [1 - prob, prob]).mean() > 0.5) and (idx != jdx)):
 				similar_groups[idx].append(jdx)
 
 	return similar_groups
