@@ -102,10 +102,7 @@ class GenerateDataset(torch.utils.data.Dataset):
 
 		self.path_to_outputs = os.path.join("./Datasets", self.dataset) # Path to save outputs for particular dataset used
 		self.path_to_outputs = os.path.join(self.path_to_outputs, self.model_backbone)
-
-		if(self.dataset == "cifar10"):
-			# This is because we are conducting an ablation study for cifar10
-			self.path_to_outputs = os.path.join(self.path_to_outputs, str(self.grouping_volatility))
+		self.path_to_outputs = os.path.join(self.path_to_outputs, str(self.grouping_volatility))
 
 		# Create this directory if it doesn't exist
 		if(not os.path.exists(self.path_to_outputs)):
