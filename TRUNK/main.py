@@ -352,7 +352,7 @@ def main():
         if(args.grouping_volatility):
             list_of_grouping_volatilities = [config.general.grouping_hyperparameters['grouping_volatility']]
         else:
-            list_of_grouping_volatilities = [idx/100 for idx in range(int(args.ablation_study[0]*100), int(args.ablation_study[1]*100), args.ablation_study[2]*100)]
+            list_of_grouping_volatilities = [idx/100 for idx in range(int(args.ablation_study[0]*100), int(args.ablation_study[1]*100), int(args.ablation_study[2]*100))]
 
         for grouping_idx, grouping_volatility in enumerate(list_of_grouping_volatilities):
             print(f"Current Grouping Volatility is {grouping_volatility}")
@@ -367,9 +367,11 @@ def main():
             list_of_accuracies.append(accuracy)
             display_confusion_matrix(confusion_matrix, testloader)
 
-        if(args.dataset.lower() == "cifar10"):
+        if(args.ablation_study):
             # visualize the ablation study of grouping volatilities and inference accuracies
             ablation_study(list_of_grouping_volatilities, list_of_accuracies, testloader)
+        else:
+            print(f"Testing accuracy is: {list_of_accuracies[0]} for dataset {args.dataset}")
 
         end_time = time.time()
         print(f"Finished Testing TRUNK in " + format_time(end_time - start_time))
