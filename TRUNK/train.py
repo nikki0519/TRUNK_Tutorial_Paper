@@ -164,7 +164,6 @@ def train(list_of_models, current_supergroup, config, grouping_volatility, model
                 loss = loss_function(sg_prediction, current_node_in_batch) 
                 loss.backward()
                 optimizer.step()
-                scheduler.step()
 
                 sg_prediction = sg_prediction.max(1, keepdim=True)[1] 
                 count += sg_prediction.eq(current_node_in_batch.view_as(sg_prediction)).sum().item() 
@@ -173,6 +172,7 @@ def train(list_of_models, current_supergroup, config, grouping_volatility, model
 
                 progress_bar.set_description(f"Epoch {epoch}/{epochs}, Batch {batch_idx + 1} / {len(trainloader)}, LR {scheduler.get_last_lr()[0]} - Train Loss: {loss / (batch_idx + 1)} | Train Acc: {100 * count / total} | Total Images Processed: {total}") # output the accuracy and training loss on the progress bar    
         max_validation_accuracy, validation_accuracy, feature_map_size = validation(list_of_models, epoch, current_supergroup, max_validation_accuracy, model_save_path, validationloader)
+        scheduler.step()
         wandb.log({"train loss": running_training_loss / len(trainloader), "validation accuracy": validation_accuracy, "lr": optimizer.param_groups[0]["lr"]})
     
     wandb.finish()
