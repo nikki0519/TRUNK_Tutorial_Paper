@@ -142,6 +142,7 @@ def test(testloader):
                     total += 1
                     break
                 
+                del model # delete the previous model and load a new one
                 model = get_model(testloader, current_supergroup=inverse_path_decisions[tuple(path_taken)])
                 depth += 1
                 current_node = target_map[depth].to(device)
