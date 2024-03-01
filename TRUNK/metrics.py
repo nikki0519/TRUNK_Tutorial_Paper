@@ -16,6 +16,7 @@ from datasets import GenerateDataset
 from pathDecisions import map_leaf_name_to_category
 from model_by_dataset import get_model
 from grouper import AverageSoftmax, SigmoidMembership
+from main import get_hyperparameters
 
 def parser():
     """
@@ -300,7 +301,8 @@ def sigmoid_membership(dataset):
 
 if __name__ == "__main__":
     args = parser()
-    dataset = GenerateDataset(args.dataset.lower(), args.model_backbone.lower(), train=False)
+    config = get_hyperparameters(f"./Datasets/{args.dataset.lower()}/{args.model_backbone.lower()}")
+    dataset = GenerateDataset(args.dataset.lower(), args.model_backbone.lower(), config=config, grouping_volatility=config.general.grouping_hyperparameters.grouping_volatility, train=False)
 
     tree_path = os.path.join(dataset.path_to_outputs, "tree.pkl") # Path to the tree based on the particular dataset and model backbone used
     inverse_category_encoding = dataset.get_inverse_integer_encoding()
