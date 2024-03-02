@@ -150,8 +150,6 @@ def test(testloader):
             progress_bar.set_description(f"Batch Idx: {batch_idx}/{len(testloader)}")
 
         accuracy = num_right / (total + 1e-5) * 100.0 # we add 1e-5 to denominator to avoid dividing by 0
-        print(f"Final Test Accuracy: {accuracy}") 
-
     return confusion_matrix, accuracy
 
 def display_confusion_matrix(confusion_matrix, testloader):
