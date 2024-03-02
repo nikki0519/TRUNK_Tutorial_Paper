@@ -370,6 +370,12 @@ def main():
             display_confusion_matrix(confusion_matrix, testloader)
 
         if(args.ablation_study):
+            # Save accuracies to a file
+            path = f"./Datasets/{args.dataset.lower()}/{args.model_backbone.lower()}/accuracies.txt"
+            with open(path, "w") as fptr:
+                for acc in list_of_accuracies:
+                    fptr.write(acc)
+
             # visualize the ablation study of grouping volatilities and inference accuracies
             ablation_study(list_of_grouping_volatilities, list_of_accuracies, testloader)
         else:
