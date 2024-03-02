@@ -17,6 +17,12 @@ from pathDecisions import map_leaf_name_to_category
 from model_by_dataset import get_model
 from grouper import AverageSoftmax, SigmoidMembership
 from main import get_hyperparameters
+import torch
+
+## Global Variables
+device = "cuda" if torch.cuda.is_available() else "cpu"
+print(f"Device is on {device} for metrics.py")
+device = torch.device(device)
 
 def parser():
     """
@@ -212,6 +218,7 @@ def num_operations(path_to_category, dataset, dict_inputs, label):
             model = get_model(torch.utils.data.DataLoader(dataset, batch_size=16, num_workers=0, shuffle=True), dataset.model_backbone, num_classes, input_size, node_value, node_value, debug_flag=False)
 
             random_input = torch.randn((1,) + tuple(input_size))
+            random_input = random_input.to(device)
             flops, params = profile(model, inputs=(random_input, ))
             
             total_flops += flops
