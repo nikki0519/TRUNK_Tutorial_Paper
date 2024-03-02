@@ -170,6 +170,7 @@ def display_confusion_matrix(confusion_matrix, testloader):
     sum_of_columns = confusion_matrix.sum(axis=0)
     confusion_matrix /= sum_of_columns
 
+    plt.figure()
     sns.heatmap(confusion_matrix, xticklabels=class_list, yticklabels=class_list, annot=True)
     plt.xlabel(f"True Label")
     plt.ylabel("Predicted Label")
@@ -197,5 +198,5 @@ def ablation_study(grouping_volatilities, accuracies, testloader):
     plt.xlabel('Grouping Volatility')
     plt.ylabel('Inference Accuracy [%]')
 
-    path = testloader.dataset.path_to_outputs
+    path = f"./Datasets/{testloader.dataset.dataset}/{testloader.dataset.model_backbone}"
     plt.savefig(f'{path}/ablation_study.png')
