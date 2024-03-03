@@ -193,6 +193,7 @@ def ablation_study(grouping_volatilities, accuracies, testloader):
         iterable test dataset
     """
 
+    plt.figure()
     plt.plot(grouping_volatilities, accuracies, marker='o', color='red')
     plt.title('Analyzing the effects of the grouping volatility which structures the tree on the testing accuracy')
     plt.xlabel('Grouping Volatility')
