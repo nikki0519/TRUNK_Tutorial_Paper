@@ -59,6 +59,28 @@ def get_training_details(config, current_sg_model):
 
     return scheduler, optimizer, loss_function, epochs
 
+def load_checkpoint(model, optimizer, checkpoint_path):
+    """
+    Load the model checkpoint which is saved at every epoch
+
+    Parameters
+    ----------
+    model: torchvision.models
+        the chosen model by the user
+
+    optimizer: torch.optim
+        propagation function
+
+    checkpoint_path: str
+        path to model checkpoints
+    """
+
+    checkpoint = torch.load(checkpoint_path)
+    model.load_state_dict(checkpoint['model_state_dict'])
+    optimizer.load_state_dict(checkpoint['optimizer_state_dict'])
+
+    start_epoch = checkpoint['epoch'] + 1  # Resume from the next epoch
+    return start_epoch
 
 def train(list_of_models, current_supergroup, config, grouping_volatility, model_save_path, trainloader, validationloader):
     """
@@ -171,14 +193,14 @@ def train(list_of_models, current_supergroup, config, grouping_volatility, model
                 running_training_loss += loss
 
                 progress_bar.set_description(f"Epoch {epoch}/{epochs}, Batch {batch_idx + 1} / {len(trainloader)}, LR {scheduler.get_last_lr()[0]} - Train Loss: {loss / (batch_idx + 1)} | Train Acc: {100 * count / total} | Total Images Processed: {total}") # output the accuracy and training loss on the progress bar    
-        max_validation_accuracy, validation_accuracy, feature_map_size = validation(list_of_models, epoch, current_supergroup, max_validation_accuracy, model_save_path, validationloader)
+        max_validation_accuracy, validation_accuracy, feature_map_size = validation(list_of_models, optimizer, epoch, current_supergroup, max_validation_accuracy, model_save_path, validationloader)
         scheduler.step()
         wandb.log({"train loss": running_training_loss / len(trainloader), "validation accuracy": validation_accuracy, "lr": optimizer.param_groups[0]["lr"]})
     
     wandb.finish()
     return feature_map_size
 
-def validation(list_of_models, epoch, current_supergroup, max_validation_accuracy, model_save_path, validationloader):
+def validation(list_of_models, optimizer, epoch, current_supergroup, max_validation_accuracy, model_save_path, validationloader):
     """
     Conduct validation testing on the current supergroup module
 
@@ -186,6 +208,9 @@ def validation(list_of_models, epoch, current_supergroup, max_validation_accurac
     ----------
     list_of_models: list
         The list of all the supergroup models
+
+    optimizer: torch.optim
+        torch propagation function
 
     epoch: int
         current epoch during training
@@ -257,6 +282,10 @@ def validation(list_of_models, epoch, current_supergroup, max_validation_accurac
         print(f"Validation Accuracy for supergroup {current_supergroup} at epoch {epoch}: {validation_accuray}")
         if(count / total > max_validation_accuracy):
             max_validation_accuracy = count / total
-            torch.save(list_of_models[-1].state_dict(), model_save_path)
+            torch.save({
+                'epoch': epoch,
+                'model_state_dict': list_of_models[-1].state_dict(),
+                'optimizer_state_dict': optimizer.state_dict(),
+            }, model_save_path)
 
     return max_validation_accuracy, validation_accuray, images_in_batch.shape
