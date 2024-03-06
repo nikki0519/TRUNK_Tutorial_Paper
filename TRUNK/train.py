@@ -12,6 +12,7 @@ from tqdm import tqdm
 from torch.optim import lr_scheduler
 import torch.optim as optim
 import wandb
+import os
 
 ## Global Variables
 device = "cuda" if torch.cuda.is_available() else "cpu"
@@ -134,8 +135,12 @@ def train(list_of_models, current_supergroup, config, grouping_volatility, model
         }
     )
 
+    start_epoch = 1
+    if(os.path.exists(model_save_path)):
+        start_epoch = load_checkpoint(list_of_models[-1], optimizer, model_save_path)
+
     max_validation_accuracy = 0.0 # keep track of the maximum accuracy to know which model to save after conducting validation
-    for epoch in range(1, epochs+1):
+    for epoch in range(start_epoch, epochs+1):
         running_training_loss = 0.0
         count = 0 
         total = 0 
