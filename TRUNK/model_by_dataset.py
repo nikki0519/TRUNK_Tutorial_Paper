@@ -78,5 +78,7 @@ def get_model(dataloader, model_backbone, number_of_classes, image_shape, curren
     
     model = model.to(device)
     if(current_supergroup != supergroup):
-        model.load_state_dict(torch.load(supergroup_weights, map_location=device))
+        checkpoint = torch.load(supergroup_weights, map_location=device)
+        model.load_state_dict(checkpoint['model_state_dict'])
+
     return model

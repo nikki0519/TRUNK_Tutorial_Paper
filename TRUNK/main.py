@@ -293,7 +293,8 @@ def main():
 
                 # Create the average softmax of this current trained supergroup
                 print("Computing Average SoftMax")
-                list_of_models[-1].load_state_dict(torch.load(path_save_model))
+                checkpoint = torch.load(path_save_model)
+                list_of_models[-1].load_state_dict(checkpoint['model_state_dict'])
 
                 path_to_softmax_matrix = os.path.join(trainloader.dataset.path_to_outputs, f"model_softmax/{current_supergroup}_avg_softmax.pt")
                 ## Create the model_softmax directory if it doesn't exist
@@ -329,8 +330,9 @@ def main():
                 if(num_children != num_classes):
                     print(f"Re-training on the current supergroup {current_supergroup} with number of children: {num_children}")
                     dictionary_of_inputs_for_models[current_supergroup][1] = num_children # changing the number of groups for the model to distinguish between
+                    os.remove(path_save_model) # Automatically remove the previously stored weights for this node
                     list_of_models = get_list_of_models_by_path(dataloader=trainloader, model_backbone=args.model_backbone, current_supergroup=current_supergroup, dictionary_of_inputs_for_models=dictionary_of_inputs_for_models, debug_flag=args.debug) # reset the weights of the current supergroup
-                    
+
                     image_shape = train(list_of_models=list_of_models, current_supergroup=current_supergroup, config=grouping_hyperparameters, grouping_volatility=grouping_volatility, model_save_path=path_save_model, trainloader=trainloader, validationloader=testloader)
                     image_shape = tuple(image_shape[1:]) # change from (BxCxHxW) -> (CxHxW)
 
