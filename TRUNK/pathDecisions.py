@@ -544,8 +544,8 @@ def get_num_classes_per_sg(path_to_tree):
     return num_class_per_sg
 
 if __name__ == "__main__":
-    path = r"/home/ravi30/TRUNK_Tutorial_Paper/TRUNK/Datasets/cifar10/mobilenet/tree.pkl"
-    # path = "/home/ravi30/TRUNK_Tutorial_Paper/TRUNK/Datasets/cifar10/DONT TOUCH/tree copy.pkl"
+    grouping_volatility = str(input("Enter grouping volatility: "))
+    path = f"/home/ravi30/TRUNK_Tutorial_Paper/TRUNK/Datasets/cifar10/vgg/{grouping_volatility}/tree.pkl"
     tree = load_tree_from_file(path)
 
     sgs = {}
