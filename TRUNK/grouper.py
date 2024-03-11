@@ -174,8 +174,8 @@ def create_supergroup_list_helper(number_of_classes, grouping_volatility, avg_so
 		for jdx in range(idx, number_of_classes):
 			prob = SigmoidMembership(number_of_classes, grouping_volatility, avg_softmax_matrix[idx][jdx])
 			# Determine if the expected value that two classes are visually similar is greater than 50%
-			# if((np.random.choice(2, 100000, p = [1 - prob, prob]).mean() > 0.5) and (idx != jdx)):
-			if((prob > 0.5) and (idx != jdx)):
+			if((np.random.choice(2, 100000, p = [1 - prob, prob]).mean() > 0.5) and (idx != jdx)):
+			# if((prob > 0.5) and (idx != jdx)):
 				similar_groups[idx].append(jdx)
 
 	return similar_groups

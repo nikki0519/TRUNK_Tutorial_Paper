@@ -2,8 +2,8 @@ seed: 42
 dataset:
   train:
     params:
-      batch_size: 16
-      num_workers: 1
+      batch_size: 32
+      num_workers: 2
       shuffle: True
     transform:
     - type: RandomCrop
@@ -17,22 +17,21 @@ dataset:
         size:
         - 224
         - 224
-    - type: RandomHorizontalFlip
     - type: ToTensor
     - type: Normalize
       params:
         mean:
-        - 0.4914
-        - 0.4822
-        - 0.4465
+        - 0.500
+        - 0.500
+        - 0.500
         std:
-        - 0.2023
-        - 0.1994
-        - 0.2010
+        - 0.500
+        - 0.500
+        - 0.500
   validation:
     params:
-      batch_size: 16
-      num_workers: 1
+      batch_size: 32
+      num_workers: 2
       shuffle: True
     transform:
     - type: RandomCrop
@@ -46,53 +45,22 @@ dataset:
         size:
         - 224
         - 224
-    - type: RandomHorizontalFlip
     - type: ToTensor
     - type: Normalize
       params:
         mean:
-        - 0.4914
-        - 0.4822
-        - 0.4465
+        - 0.500
+        - 0.500
+        - 0.500
         std:
-        - 0.2023
-        - 0.1994
-        - 0.2010
+        - 0.500
+        - 0.500
+        - 0.500
   test:
     params:
       batch_size: 1
-      num_workers: 1
+      num_workers: 2
       shuffle: True
-root:
-  class_hyperparameters:
-    loss: 
-    - type: NLLLoss
-    lr_scheduler: 
-    - type: CosineAnnealingLR
-      params:
-        T_max: 10
-        eta_min: 0
-    optimizer: 
-    - type: Adam
-      params:
-        lr: 0.001
-        weight_decay: 0.0001
-    epochs: 10
-  grouping_hyperparameters:
-    loss: 
-    - type: NLLLoss
-    grouping_volatility: 0.70
-    lr_scheduler: 
-    - type: CosineAnnealingLR
-      params:
-        T_max: 10
-        eta_min: 0
-    optimizer: 
-    - type: Adam
-      params:
-        lr: 0.001
-        weight_decay: 0.0005
-    epochs: 45
 general:
   class_hyperparameters:
     loss: 
@@ -105,7 +73,7 @@ general:
     optimizer: 
     - type: Adam
       params:
-        lr: 0.0001
+        lr: 0.001
         weight_decay: 0.0005
     epochs: 40
   grouping_hyperparameters:
@@ -122,4 +90,4 @@ general:
       params:
         lr: 0.0001
         weight_decay: 0.0005
-    epochs: 80
+    epochs: 40

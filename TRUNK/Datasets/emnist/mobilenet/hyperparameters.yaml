@@ -2,14 +2,14 @@ seed: 42
 dataset:
   train:
     params:
-      batch_size: 16
+      batch_size: 128
       num_workers: 2
       shuffle: True
     transform:
     - type: ToTensor
   validation:
     params:
-      batch_size: 16
+      batch_size: 128
       num_workers: 2
       shuffle: True
     transform:

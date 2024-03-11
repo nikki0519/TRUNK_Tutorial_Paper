@@ -58,9 +58,10 @@ class InvertedResidual(nn.Module):
 class MNN(nn.Module):
 	def __init__(self, supergroup, number_of_classes, input_shape, debug_flag=True):
 		super(MNN, self).__init__()
+		self.supergroup = supergroup
 		self.number_of_classes = number_of_classes
 		self.debug_flag = debug_flag
-		self.features = self._make_layer(supergroup, input_shape[0]) # Feature extraction of the image passed through based on the supergroup
+		self.features = self._make_layer(input_shape[0]) # Feature extraction of the image passed through based on the supergroup
 		self.sample_input = torch.unsqueeze(torch.ones(input_shape), dim=0) # input shape = 1 x channels x height x width with ones as dummy input
 		if(self.debug_flag):
 			print(f"MobileNetMNN: sample_input.shape = {self.sample_input.shape}")
@@ -77,9 +78,9 @@ class MNN(nn.Module):
 			nn.Flatten()
 		)
 
-	def _make_layer(self, supergroup, input_channel):
+	def _make_layer(self, input_channel):
 		layers = []
-		if(supergroup == "root"):
+		if(self.supergroup == "root"):
 			layers.append(nn.Conv2d(in_channels=input_channel, out_channels=24, kernel_size=3, stride=2, padding=1))
 			layers.append(nn.BatchNorm2d(num_features=24))
 			layers.append(nn.ReLU6(inplace=True))

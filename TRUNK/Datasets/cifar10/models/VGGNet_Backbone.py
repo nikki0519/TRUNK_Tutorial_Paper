@@ -9,11 +9,26 @@
 import torch
 import torch.nn as nn
 
+class DynamicNormalization(nn.Module):
+	def __init__(self, batch_norm=True):
+		super(DynamicNormalization, self).__init__()
+		self.batch_norm = batch_norm
+
+	def forward(self, x):
+		N, C, H, W = x.shape
+		if(self.batch_norm):
+			norm_layer = nn.BatchNorm2d(num_features=C).to(x.device)
+		else:
+			norm_layer = nn.LayerNorm([C, H, W]).to(x.device)
+
+		return norm_layer(x)
+
 class MNN(nn.Module):
 	def __init__(self, supergroup, number_of_classes, input_shape, debug_flag=True) -> None:
 		super(MNN, self).__init__()
+		self.supergroup = supergroup
 		self.number_of_classes = number_of_classes
-		self.features = self._make_layer(supergroup, input_shape[0])
+		self.features = self._make_layer(input_shape[0], batch_norm=True)
 		self.debug_flag = debug_flag
 
 		self.sample_input = torch.unsqueeze(torch.ones(input_shape), dim=0) # input shape = 1 x channels x height x width with ones as dummy input
@@ -30,30 +45,49 @@ class MNN(nn.Module):
 			nn.Linear(in_features=classifier_features.shape[1], out_features=self.number_of_classes)
 		)
 		
-	def _make_layer(self, supergroup, input_channel):
+	def _make_layer(self, input_channel, batch_norm=True):
 		layers = []
-		if(supergroup == "root"):
+		if(self.supergroup == "root"):
 			layers.append(nn.Conv2d(in_channels=input_channel, out_channels=16, kernel_size=3, padding=1))
+			layers.append(DynamicNormalization(batch_norm=batch_norm))
+			layers.append(nn.ReLU(inplace=True))
+			###
 			layers.append(nn.Conv2d(in_channels=16, out_channels=32, kernel_size=3, padding=1))
+			layers.append(DynamicNormalization(batch_norm=batch_norm))
+			layers.append(nn.ReLU(inplace=True))
+			###
 			layers.append(nn.Conv2d(in_channels=32, out_channels=32, kernel_size=3, padding=1))
+			layers.append(DynamicNormalization(batch_norm=batch_norm))
+			layers.append(nn.ReLU(inplace=True))
+			###
 			layers.append(nn.Conv2d(in_channels=32, out_channels=32, kernel_size=3, padding=1))
+			layers.append(DynamicNormalization(batch_norm=batch_norm))
+			layers.append(nn.ReLU(inplace=True))
+			###
 			layers.append(nn.MaxPool2d(kernel_size=2, stride=2))
-			layers.append(nn.Dropout())
+			###
+			layers.append(nn.Dropout2d(p=0.5))
 			
 		else:
-			layers.append(nn.Conv2d(in_channels=input_channel, out_channels=32, kernel_size=3, padding=1))
-			layers.append(nn.Conv2d(in_channels=32, out_channels=32, kernel_size=3, padding=1))
-			layers.append(nn.Conv2d(in_channels=32, out_channels=64, kernel_size=3, padding=1))
-			layers.append(nn.Dropout())
+			layers.append(nn.Conv2d(in_channels=input_channel, out_channels=16, kernel_size=3, padding=1))
+			layers.append(DynamicNormalization(batch_norm=batch_norm))
+			layers.append(nn.ReLU(inplace=True))
+			###
+			layers.append(nn.Conv2d(in_channels=16, out_channels=32, kernel_size=3, padding=1))
+			layers.append(DynamicNormalization(batch_norm=batch_norm))
+			layers.append(nn.ReLU(inplace=True))
+			###
+			layers.append(nn.Dropout2d(p=0.5))
 
+		layers.append(nn.AvgPool2d(kernel_size=1, stride=1))
 		return nn.Sequential(*layers)
 	
 	def forward(self, x):
 		features = self.features(x)
-		features = features.view(features.shape[0], -1)
-		prediction = self.classifier(features)
-		return features, prediction 
-	
+		features_flattend = features.view(features.shape[0], -1)
+		prediction = self.classifier(features_flattend)
+		return features, prediction
+
 	def evaluate(self, x):
 		self.eval()
 		return self.forward(x)

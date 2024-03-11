@@ -84,29 +84,21 @@ class MNN(nn.Module):
 	def _make_layer(self, input_channel):
 		layers = []
 		if(self.supergroup == "root"):
-			layers.append(nn.Conv2d(in_channels=input_channel, out_channels=32, kernel_size=3, stride=2, padding=1))
-			layers.append(nn.BatchNorm2d(num_features=32))
+			layers.append(nn.Conv2d(in_channels=input_channel, out_channels=24, kernel_size=3, stride=2, padding=1))
+			layers.append(nn.BatchNorm2d(num_features=24))
 			layers.append(nn.ReLU6(inplace=True))
 			###
-			layers.append(InvertedResidual(ch_in=32, ch_out=64, width_multiplier=2, stride=1))
-			layers.append(InvertedResidual(ch_in=64, ch_out=64, width_multiplier=4, stride=1))
+			layers.append(InvertedResidual(ch_in=24, ch_out=24, width_multiplier=2, stride=1))
+			layers.append(InvertedResidual(ch_in=24, ch_out=24, width_multiplier=4, stride=1))
+			layers.append(InvertedResidual(ch_in=24, ch_out=24, width_multiplier=4, stride=1))
+			layers.append(InvertedResidual(ch_in=24, ch_out=32, width_multiplier=4, stride=1))
+			layers.append(InvertedResidual(ch_in=32, ch_out=32, width_multiplier=4, stride=1))
+			layers.append(InvertedResidual(ch_in=32, ch_out=32, width_multiplier=4, stride=1))
 
-		else:
-			layers.append(nn.Conv2d(in_channels=input_channel, out_channels=32, kernel_size=3, stride=2, padding=1))
-			layers.append(nn.BatchNorm2d(num_features=32))
-			layers.append(nn.ReLU6(inplace=True))
-			layers.append(nn.Dropout2d(p=0.5, inplace=True))
-			###
-			layers.append(nn.Conv2d(in_channels=32, out_channels=32, kernel_size=3, stride=2, padding=1))
-			layers.append(nn.BatchNorm2d(num_features=32))
-			layers.append(nn.ReLU6(inplace=True))
-			layers.append(nn.Dropout2d(p=0.5, inplace=True))
-			###
-			layers.append(InvertedResidual(ch_in=32, ch_out=64, width_multiplier=2, stride=1))
-			layers.append(InvertedResidual(ch_in=64, ch_out=128, width_multiplier=2, stride=1))
-			layers.append(InvertedResidual(ch_in=128, ch_out=128, width_multiplier=4, stride=1))
-			layers.append(InvertedResidual(ch_in=128, ch_out=128, width_multiplier=4, stride=1))
-			layers.append(InvertedResidual(ch_in=128, ch_out=64, width_multiplier=4, stride=1))
+		else: # Every other supergroup
+			layers.append(InvertedResidual(ch_in=input_channel, ch_out=48, width_multiplier=4, stride=1))
+			layers.append(InvertedResidual(ch_in=48, ch_out=48, width_multiplier=4, stride=1))
+			layers.append(InvertedResidual(ch_in=48, ch_out=48, width_multiplier=4, stride=1))
 
 		return nn.Sequential(*layers)
 	
