@@ -29,7 +29,7 @@ def parser():
 		user arguments 
 	"""
 	parser = argparse.ArgumentParser(description="Comparing other Image Classification Models")
-	parser.add_argument("--train_batch_size", type=int, help="Training Batch Size", default=8)
+	parser.add_argument("--train_batch_size", type=int, help="Training Batch Size", default=16)
 	parser.add_argument("--eval_batch_size", type=int, help="Evaluation Batch Size", default=1)
 	parser.add_argument("--num_workers", type=int, help="Number of parallel workers for dataloader", default=0)
 	parser.add_argument("--dataset", type=str, help="EMNIST, SVHN, CIFAR-10", choices=["emnist", "svhn", "cifar10"], default="emnist")
@@ -63,7 +63,7 @@ def load_dataset(dataset, train=False):
 	if(train):
 		if(dataset == "emnist"):
 				return datasets.EMNIST(
-								root="../data/train",
+								root="/scratch/gilbreth/ravi30/data/train",
 								split="balanced",
 								train=True,
 								download=True,
@@ -71,13 +71,13 @@ def load_dataset(dataset, train=False):
 						)
 		
 		elif(dataset == "svhn"):
-			return datasets.SVHN(root="../data/train/",
+			return datasets.SVHN(root="/scratch/gilbreth/ravi30/data/train/",
 								split="train",
 								download=True,
 								transform=transform)
 		
 		elif(dataset == "cifar10"):
-			return datasets.CIFAR10(root="../data/train/", 
+			return datasets.CIFAR10(root="/scratch/gilbreth/ravi30/data/train/", 
 									 train=True, 
 									 download=True, 
 									 transform=transform)
@@ -85,20 +85,20 @@ def load_dataset(dataset, train=False):
 	else:
 		if(dataset == "emnist"):
 			return datasets.EMNIST(
-							root="../data/test/",
+							root="/scratch/gilbreth/ravi30/data/test/",
 							split="balanced",
 							train=False,
 							download=True,
 							transform=transform)
 
 		elif(dataset == "svhn"):
-			return datasets.SVHN(root="../data/test/",
+			return datasets.SVHN(root="/scratch/gilbreth/ravi30/data/test/",
 								split="test",
 								download=True,
 								transform=transform)
 		
 		elif(dataset == "cifar10"):
-			return datasets.CIFAR10(root="../data/test/", 
+			return datasets.CIFAR10(root="/scratch/gilbreth/ravi30/data/test/", 
 									train=False, 
 									download=True, 
 									transform=transform)
