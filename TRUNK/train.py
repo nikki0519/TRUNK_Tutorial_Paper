@@ -90,33 +90,19 @@ def train(list_of_models, current_supergroup, config, grouping_volatility, model
     Parameters
     ----------
     list_of_models: list
-        The list of all the supergroup models
-    
     current_supergroup: str
-        The current supergroup label
-    
     epochs: int
-        Number of epochs to train for
-
-    config: dict
+    config: OmegaConf
         dictionary containing information on the hyperparameters and training regime
-
     grouping_volatility: float
         the factor used in the ASL calculation and plays a role in how the tree is structured
-
     model_save_path: str
-        the path to save the trained supergroup module
-        
     trainloader: torch.utils.data.DataLoader
-        The training dataloader to train the supergroup modules with
-
     validationloader: torch.utils.data.DataLoader
-        The validation dataloader to conduct validation on the supergroup modules with
 
     Return
     ------
     feature_map_shape: tuple (BxCxHxW)
-        the new shape of the feature map
     """
     scheduler, optimizer, loss_function, epochs = get_training_details(config, list_of_models[-1])
     # Log metrics on Weights and Biases Platform
@@ -156,9 +142,8 @@ def train(list_of_models, current_supergroup, config, grouping_volatility, model
                 noBatch = False # If none of the images in the batch have the right paths predicted, then set noBatch=True so that we can skip this batch
 
                 """
-                This loop in line 62 iterates through the list of models to identify whether the current_node_in_batch, predicted by the models, 
-                is the same as the true node at the current depth of the tree. Only those images that correspond to the true node at every depth of the tree
-                is saved. This will be our ground truth. 
+                This loop in line 62 iterates through the list of models to identify all the images that have the correct predictions across all the nodes 
+                down the tree until we reach the current node we intend to train. This will be our set of ground-truth images for the current node. 
                 """
 
                 for model_idx in range(len(list_of_models) - 1): 
@@ -212,36 +197,20 @@ def validation(list_of_models, optimizer, epoch, current_supergroup, max_validat
     Parameters
     ----------
     list_of_models: list
-        The list of all the supergroup models
-
     optimizer: torch.optim
-        torch propagation function
-
     epoch: int
-        current epoch during training
-    
     current_supergroup: str
-        The current supergroup label
-    
     max_validation_accuracy: float
         Keep track of the maximum accuracy to know which model to save after conducting validation
-
     model_save_path: str
-        the path to save the trained supergroup module
-
     validationloader: torch.utils.data.DataLoader
-        The validation dataloader to conduct validation on the supergroup modules with
 
     Return
     ------
     max_validation_accuracy: float
         the updated max_validation_accuracy if there is an update in the accuracy of the model
-
     validation_accuracy: float
-        the current epoch's validation accuracy
-    
     images_in_batch.shape: tuple (BxCxHxW)
-        the new shape of the feature map
     """
 
     count = 0

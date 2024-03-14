@@ -131,10 +131,10 @@ def SigmoidMembership(number_of_classes, grouping_volatility, x):
 	Parameters
 	----------
 	number_of_classes: int
-		the number of supergroups
+		the number of supergroups/children the node is responsible for
 
 	grouping_volatility: float
-		constant for sigmoidal membership
+		constant that contributes to the structure of the tree
 
 	x: float
 		the average softmax at a particular index (class idx, class jdx) of the average softmax matrix
