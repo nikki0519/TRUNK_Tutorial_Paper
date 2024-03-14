@@ -309,7 +309,8 @@ def sigmoid_membership(dataset):
 if __name__ == "__main__":
     args = parser()
     config = get_hyperparameters(f"./Datasets/{args.dataset.lower()}/{args.model_backbone.lower()}")
-    dataset = GenerateDataset(args.dataset.lower(), args.model_backbone.lower(), config=config, grouping_volatility=config.general.grouping_hyperparameters.grouping_volatility, train=False)
+    grouping_volatility = config.general.grouping_hyperparameters.grouping_volatility
+    dataset = GenerateDataset(args.dataset.lower(), args.model_backbone.lower(), config=config, grouping_volatility=grouping_volatility, train=False)
 
     tree_path = os.path.join(dataset.path_to_outputs, "tree.pkl") # Path to the tree based on the particular dataset and model backbone used
     inverse_category_encoding = dataset.get_inverse_integer_encoding()
