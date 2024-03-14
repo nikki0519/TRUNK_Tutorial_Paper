@@ -36,6 +36,7 @@ def parser():
     parser = argparse.ArgumentParser(description="Metrics to measure TRUNK")
     parser.add_argument("--dataset", type=str, help="emnist, svhn, cifar10", default="emnist")
     parser.add_argument("--model_backbone", type=str, help="vgg or mobilenet", default="mobilenet")
+    parser.add_argument("--ablation_study", nargs=3, type=float, help="the starting, ending grouping volatilites, and its increment step. We study the impact of this range of coefficients on the testing accuracy.")
     parser.add_argument("--visualize", action="store_true", help="Save visual of the tree")
     parser.add_argument("--untrained_asl", action="store_true", help="Get ASL of untrained root")
     args = parser.parse_args()
@@ -309,28 +310,36 @@ def sigmoid_membership(dataset):
 if __name__ == "__main__":
     args = parser()
     config = get_hyperparameters(f"./Datasets/{args.dataset.lower()}/{args.model_backbone.lower()}")
-    grouping_volatility = config.general.grouping_hyperparameters.grouping_volatility
-    dataset = GenerateDataset(args.dataset.lower(), args.model_backbone.lower(), config=config, grouping_volatility=grouping_volatility, train=False)
 
-    tree_path = os.path.join(dataset.path_to_outputs, "tree.pkl") # Path to the tree based on the particular dataset and model backbone used
-    inverse_category_encoding = dataset.get_inverse_integer_encoding()
-    nodes_dict = update_leaf_names(dataset.get_dictionary_of_nodes(), inverse_category_encoding, tree_path)
+    if(args.ablation_study):
+        list_of_grouping_volatilities = [idx/100 for idx in range(int(args.ablation_study[0]*100), int(args.ablation_study[1]*100), int(args.ablation_study[2]*100))]
+    else:
+        list_of_grouping_volatilities = [config.general.grouping_hyperparameters.grouping_volatility]
 
-    if(args.visualize):
-        visualize_tree(dataset.path_to_outputs, nodes_dict["root"])
+    for grouping_volatility in list_of_grouping_volatilities:
+        print(f"------Current Grouping Volatility: {grouping_volatility}---------")
+        dataset = GenerateDataset(args.dataset.lower(), args.model_backbone.lower(), config=config, grouping_volatility=grouping_volatility, train=False)
 
-    longest_path = longest_path_down_tree(nodes_dict["root"])
-    shortest_path = shortest_path_down_tree(nodes_dict["root"])
+        tree_path = os.path.join(dataset.path_to_outputs, "tree.pkl") # Path to the tree based on the particular dataset and model backbone used
+        inverse_category_encoding = dataset.get_inverse_integer_encoding()
+        nodes_dict = update_leaf_names(dataset.get_dictionary_of_nodes(), inverse_category_encoding, tree_path)
 
-    path_to_model_weights = os.path.join(dataset.path_to_outputs, f"model_weights")
-    print_size_of_model(shortest_path, path_to_model_weights, label=f"Shortest path (root -> {shortest_path[-1]}) size (MB): ")
-    print_size_of_model(longest_path, path_to_model_weights, label=f"Longest path (root -> {longest_path[-1]}) size (MB): ")
+        if(args.visualize):
+            visualize_tree(dataset.path_to_outputs, nodes_dict["root"])
+    
+        longest_path = longest_path_down_tree(nodes_dict["root"])
+        shortest_path = shortest_path_down_tree(nodes_dict["root"])
 
-    dict_model_inputs = json.load(open(os.path.join(dataset.path_to_outputs, "model_weights/inputs_to_models.json")))
-    num_operations(shortest_path, dataset, dict_model_inputs, label="shortest")
-    num_operations(longest_path, dataset, dict_model_inputs, label="longest")
+        path_to_model_weights = os.path.join(dataset.path_to_outputs, f"model_weights")
+        print_size_of_model(shortest_path, path_to_model_weights, label=f"Shortest path (root -> {shortest_path[-1]}) size (MB): ")
+        print_size_of_model(longest_path, path_to_model_weights, label=f"Longest path (root -> {longest_path[-1]}) size (MB): ")
 
-    if(args.untrained_asl and args.dataset == "cifar10"):
-        untrained_root_asl(dataset)
-        display_asl_matrix(dataset)
-        sigmoid_membership(dataset)
+        dict_model_inputs = json.load(open(os.path.join(dataset.path_to_outputs, "model_weights/inputs_to_models.json")))
+        num_operations(shortest_path, dataset, dict_model_inputs, label="shortest")
+        num_operations(longest_path, dataset, dict_model_inputs, label="longest")
+
+        if(args.untrained_asl):
+            untrained_root_asl(dataset)
+            display_asl_matrix(dataset)
+            sigmoid_membership(dataset)
+        
