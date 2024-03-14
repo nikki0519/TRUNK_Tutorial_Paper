@@ -186,7 +186,11 @@ def train(list_of_models, current_supergroup, config, grouping_volatility, model
         max_validation_accuracy, validation_accuracy, feature_map_size = validation(list_of_models, optimizer, epoch, current_supergroup, max_validation_accuracy, model_save_path, validationloader)
         scheduler.step()
         wandb.log({"train loss": running_training_loss / len(trainloader), "validation accuracy": validation_accuracy, "lr": optimizer.param_groups[0]["lr"]})
-    
+
+        if(max_validation_accuracy >= 0.9):
+            print("Model achieved an accuracy of at least 90%")
+            break
+
     wandb.finish()
     return feature_map_size
 
