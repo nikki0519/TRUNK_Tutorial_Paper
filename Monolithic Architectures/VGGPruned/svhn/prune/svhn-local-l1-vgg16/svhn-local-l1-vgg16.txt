@@ -1,0 +1,129 @@
+[03/12 22:37:34] svhn-local-l1-vgg16 INFO: mode: prune
+[03/12 22:37:34] svhn-local-l1-vgg16 INFO: model: vgg16
+[03/12 22:37:34] svhn-local-l1-vgg16 INFO: verbose: False
+[03/12 22:37:34] svhn-local-l1-vgg16 INFO: dataset: svhn
+[03/12 22:37:34] svhn-local-l1-vgg16 INFO: batch_size: 128
+[03/12 22:37:34] svhn-local-l1-vgg16 INFO: total_epochs: 100
+[03/12 22:37:34] svhn-local-l1-vgg16 INFO: lr_decay_milestones: 60,80
+[03/12 22:37:34] svhn-local-l1-vgg16 INFO: lr_decay_gamma: 0.1
+[03/12 22:37:34] svhn-local-l1-vgg16 INFO: lr: 0.01
+[03/12 22:37:34] svhn-local-l1-vgg16 INFO: restore: None
+[03/12 22:37:34] svhn-local-l1-vgg16 INFO: output_dir: /home/ravi30/TRUNK_Tutorial_Paper/Monolithic Architectures/VGGPruned/svhn/prune/svhn-local-l1-vgg16
+[03/12 22:37:34] svhn-local-l1-vgg16 INFO: method: l1
+[03/12 22:37:34] svhn-local-l1-vgg16 INFO: speed_up: 2
+[03/12 22:37:34] svhn-local-l1-vgg16 INFO: max_pruning_ratio: 1.0
+[03/12 22:37:34] svhn-local-l1-vgg16 INFO: soft_keeping_ratio: 0.0
+[03/12 22:37:34] svhn-local-l1-vgg16 INFO: reg: 0.0005
+[03/12 22:37:34] svhn-local-l1-vgg16 INFO: delta_reg: 0.0001
+[03/12 22:37:34] svhn-local-l1-vgg16 INFO: weight_decay: 0.0005
+[03/12 22:37:34] svhn-local-l1-vgg16 INFO: seed: 42
+[03/12 22:37:34] svhn-local-l1-vgg16 INFO: global_pruning: False
+[03/12 22:37:34] svhn-local-l1-vgg16 INFO: sl_total_epochs: 100
+[03/12 22:37:34] svhn-local-l1-vgg16 INFO: sl_lr: 0.01
+[03/12 22:37:34] svhn-local-l1-vgg16 INFO: sl_lr_decay_milestones: 60,80
+[03/12 22:37:34] svhn-local-l1-vgg16 INFO: sl_reg_warmup: 0
+[03/12 22:37:34] svhn-local-l1-vgg16 INFO: sl_restore: None
+[03/12 22:37:34] svhn-local-l1-vgg16 INFO: iterative_steps: 400
+[03/12 22:37:34] svhn-local-l1-vgg16 INFO: logger: <Logger svhn-local-l1-vgg16 (DEBUG)>
+[03/12 22:37:34] svhn-local-l1-vgg16 INFO: device: cuda
+[03/12 22:37:34] svhn-local-l1-vgg16 INFO: num_classes: 10
+[03/12 22:38:16] svhn-local-l1-vgg16 INFO: Pruning...
+[03/12 22:38:22] svhn-local-l1-vgg16 INFO: VGG(
+  (block0): Sequential(
+    (0): Conv2d(3, 45, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+    (1): BatchNorm2d(45, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+    (2): ReLU(inplace=True)
+    (3): Conv2d(45, 45, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+    (4): BatchNorm2d(45, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+  )
+  (block1): Sequential(
+    (0): Conv2d(45, 90, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+    (1): BatchNorm2d(90, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+    (2): ReLU(inplace=True)
+    (3): Conv2d(90, 90, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+    (4): BatchNorm2d(90, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+  )
+  (block2): Sequential(
+    (0): Conv2d(90, 181, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+    (1): BatchNorm2d(181, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+    (2): ReLU(inplace=True)
+    (3): Conv2d(181, 181, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+    (4): BatchNorm2d(181, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+    (5): ReLU(inplace=True)
+    (6): Conv2d(181, 181, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+    (7): BatchNorm2d(181, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+  )
+  (block3): Sequential(
+    (0): Conv2d(181, 362, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+    (1): BatchNorm2d(362, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+    (2): ReLU(inplace=True)
+    (3): Conv2d(362, 362, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+    (4): BatchNorm2d(362, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+    (5): ReLU(inplace=True)
+    (6): Conv2d(362, 362, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+    (7): BatchNorm2d(362, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+  )
+  (block4): Sequential(
+    (0): Conv2d(362, 362, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+    (1): BatchNorm2d(362, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+    (2): ReLU(inplace=True)
+    (3): Conv2d(362, 362, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+    (4): BatchNorm2d(362, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+    (5): ReLU(inplace=True)
+    (6): Conv2d(362, 362, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1))
+    (7): BatchNorm2d(362, eps=1e-05, momentum=0.1, affine=True, track_running_stats=True)
+  )
+  (pool0): MaxPool2d(kernel_size=2, stride=2, padding=0, dilation=1, ceil_mode=False)
+  (pool1): MaxPool2d(kernel_size=2, stride=2, padding=0, dilation=1, ceil_mode=False)
+  (pool2): MaxPool2d(kernel_size=2, stride=2, padding=0, dilation=1, ceil_mode=False)
+  (pool3): MaxPool2d(kernel_size=2, stride=2, padding=0, dilation=1, ceil_mode=False)
+  (pool4): AdaptiveAvgPool2d(output_size=(1, 1))
+  (classifier): Linear(in_features=362, out_features=10, bias=True)
+)
+[03/12 22:38:58] svhn-local-l1-vgg16 INFO: Params: 14.73 M => 7.36 M (50.00%)
+[03/12 22:38:58] svhn-local-l1-vgg16 INFO: FLOPs: 19565.84 M => 9782.16 M (50.00%, 2.00X )
+[03/12 22:38:58] svhn-local-l1-vgg16 INFO: Acc: 0.0638 => 0.0614
+[03/12 22:38:58] svhn-local-l1-vgg16 INFO: Val Loss: 2.3034 => 2.3027
+[03/12 22:38:58] svhn-local-l1-vgg16 INFO: Finetuning...
+[03/12 22:44:36] svhn-local-l1-vgg16 INFO: Epoch 0/100, Acc=0.6059, Val Loss=1.2211, lr=0.0100
+[03/12 22:50:17] svhn-local-l1-vgg16 INFO: Epoch 1/100, Acc=0.8560, Val Loss=0.4834, lr=0.0100
+[03/12 22:55:58] svhn-local-l1-vgg16 INFO: Epoch 2/100, Acc=0.8910, Val Loss=0.3626, lr=0.0100
+[03/12 23:01:39] svhn-local-l1-vgg16 INFO: Epoch 3/100, Acc=0.9101, Val Loss=0.3204, lr=0.0100
+[03/12 23:07:20] svhn-local-l1-vgg16 INFO: Epoch 4/100, Acc=0.9221, Val Loss=0.2685, lr=0.0100
+[03/12 23:13:01] svhn-local-l1-vgg16 INFO: Epoch 5/100, Acc=0.9119, Val Loss=0.2989, lr=0.0100
+[03/12 23:18:42] svhn-local-l1-vgg16 INFO: Epoch 6/100, Acc=0.9458, Val Loss=0.1993, lr=0.0100
+[03/12 23:24:23] svhn-local-l1-vgg16 INFO: Epoch 7/100, Acc=0.9295, Val Loss=0.2490, lr=0.0100
+[03/12 23:30:03] svhn-local-l1-vgg16 INFO: Epoch 8/100, Acc=0.9365, Val Loss=0.2231, lr=0.0100
+[03/12 23:35:44] svhn-local-l1-vgg16 INFO: Epoch 9/100, Acc=0.9181, Val Loss=0.2738, lr=0.0100
+[03/12 23:41:25] svhn-local-l1-vgg16 INFO: Epoch 10/100, Acc=0.9468, Val Loss=0.1941, lr=0.0100
+[03/12 23:47:05] svhn-local-l1-vgg16 INFO: Epoch 11/100, Acc=0.9268, Val Loss=0.2546, lr=0.0100
+[03/12 23:52:44] svhn-local-l1-vgg16 INFO: Epoch 12/100, Acc=0.9407, Val Loss=0.2105, lr=0.0100
+[03/12 23:58:24] svhn-local-l1-vgg16 INFO: Epoch 13/100, Acc=0.9410, Val Loss=0.2106, lr=0.0100
+[03/13 00:04:03] svhn-local-l1-vgg16 INFO: Epoch 14/100, Acc=0.9310, Val Loss=0.2350, lr=0.0100
+[03/13 00:09:42] svhn-local-l1-vgg16 INFO: Epoch 15/100, Acc=0.9297, Val Loss=0.2474, lr=0.0100
+[03/13 00:15:22] svhn-local-l1-vgg16 INFO: Epoch 16/100, Acc=0.9435, Val Loss=0.2027, lr=0.0100
+[03/13 00:21:02] svhn-local-l1-vgg16 INFO: Epoch 17/100, Acc=0.9423, Val Loss=0.2062, lr=0.0100
+[03/13 00:26:42] svhn-local-l1-vgg16 INFO: Epoch 18/100, Acc=0.9402, Val Loss=0.2106, lr=0.0100
+[03/13 00:32:22] svhn-local-l1-vgg16 INFO: Epoch 19/100, Acc=0.9466, Val Loss=0.1970, lr=0.0100
+[03/13 00:38:01] svhn-local-l1-vgg16 INFO: Epoch 20/100, Acc=0.9234, Val Loss=0.2657, lr=0.0100
+[03/13 00:43:41] svhn-local-l1-vgg16 INFO: Epoch 21/100, Acc=0.9310, Val Loss=0.2456, lr=0.0100
+[03/13 00:49:19] svhn-local-l1-vgg16 INFO: Epoch 22/100, Acc=0.9397, Val Loss=0.2132, lr=0.0100
+[03/13 00:54:59] svhn-local-l1-vgg16 INFO: Epoch 23/100, Acc=0.9377, Val Loss=0.2205, lr=0.0100
+[03/13 01:00:40] svhn-local-l1-vgg16 INFO: Epoch 24/100, Acc=0.9341, Val Loss=0.2349, lr=0.0100
+[03/13 01:06:20] svhn-local-l1-vgg16 INFO: Epoch 25/100, Acc=0.9469, Val Loss=0.1919, lr=0.0100
+[03/13 01:12:01] svhn-local-l1-vgg16 INFO: Epoch 26/100, Acc=0.9481, Val Loss=0.1896, lr=0.0100
+[03/13 01:17:43] svhn-local-l1-vgg16 INFO: Epoch 27/100, Acc=0.9437, Val Loss=0.2022, lr=0.0100
+[03/13 01:23:23] svhn-local-l1-vgg16 INFO: Epoch 28/100, Acc=0.9466, Val Loss=0.1981, lr=0.0100
+[03/13 01:29:04] svhn-local-l1-vgg16 INFO: Epoch 29/100, Acc=0.9480, Val Loss=0.1933, lr=0.0100
+[03/13 01:34:44] svhn-local-l1-vgg16 INFO: Epoch 30/100, Acc=0.9432, Val Loss=0.2043, lr=0.0100
+[03/13 01:40:25] svhn-local-l1-vgg16 INFO: Epoch 31/100, Acc=0.9435, Val Loss=0.2062, lr=0.0100
+[03/13 01:46:06] svhn-local-l1-vgg16 INFO: Epoch 32/100, Acc=0.9451, Val Loss=0.2025, lr=0.0100
+[03/13 01:51:47] svhn-local-l1-vgg16 INFO: Epoch 33/100, Acc=0.9443, Val Loss=0.2063, lr=0.0100
+[03/13 01:57:29] svhn-local-l1-vgg16 INFO: Epoch 34/100, Acc=0.9437, Val Loss=0.2044, lr=0.0100
+[03/13 02:03:10] svhn-local-l1-vgg16 INFO: Epoch 35/100, Acc=0.9418, Val Loss=0.2117, lr=0.0100
+[03/13 02:08:50] svhn-local-l1-vgg16 INFO: Epoch 36/100, Acc=0.9378, Val Loss=0.2233, lr=0.0100
+[03/13 02:14:32] svhn-local-l1-vgg16 INFO: Epoch 37/100, Acc=0.9496, Val Loss=0.1943, lr=0.0100
+[03/13 02:20:13] svhn-local-l1-vgg16 INFO: Epoch 38/100, Acc=0.9466, Val Loss=0.1993, lr=0.0100
+[03/13 02:25:53] svhn-local-l1-vgg16 INFO: Epoch 39/100, Acc=0.9338, Val Loss=0.2327, lr=0.0100
+[03/13 02:31:34] svhn-local-l1-vgg16 INFO: Epoch 40/100, Acc=0.9463, Val Loss=0.1981, lr=0.0100
+[03/13 02:37:15] svhn-local-l1-vgg16 INFO: Epoch 41/100, Acc=0.9412, Val Loss=0.2198, lr=0.0100
