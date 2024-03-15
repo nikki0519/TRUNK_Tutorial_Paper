@@ -81,8 +81,10 @@ def get_model(dataloader, current_supergroup):
     else:
         raise Exception("Please provide a valid dataset, i.e. emnist, cifar10, or svhn")
 
-    checkpoint = torch.load(path_to_current_sg_weights)
-    model.load_state_dict(checkpoint['model_state_dict'])
+    # checkpoint = torch.load(path_to_current_sg_weights)
+    # model.load_state_dict(checkpoint['model_state_dict'])
+
+    model.load_state_dict(torch.load(path_to_current_sg_weights)) # uncomment for batchNorm folder
     model = model.to(device)
     return model
 
