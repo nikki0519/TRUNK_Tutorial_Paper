@@ -7,19 +7,12 @@ The Datasets directory is further divided into the three folderes representing t
 
 The architecture design varies by the different datasets used and is inspired by the [MobileNetv2][1] and [VGG-16][2] networks. The pre-trained weights are available for the MobileNet inspired architecture. The networks for each dataset are found in Datasets/dataset name/models
 
-The data (EMNIST, CiFAR10, and SVHN) used to train and test the TRUNK model will be downloaded from torchvision when executing the main.py script as demonstrated in the training section. We have also provided the SHA-1 checksum of our datasets:
-
-| Dataset Name | SHA-1 Checksum |
-|--------------|----------------|
-| EMNIST | 943e9bb542928ec2f44d85d97e59761bb93aef80   |
-| CIFAR-10 | da39a3ee5e6b4b0d3255bfef95601890afd80709  |
-| SVHN | da39a3ee5e6b4b0d3255bfef95601890afd80709    |
-
+The data (EMNIST, CiFAR10, and SVHN) used to train and test the TRUNK model will be downloaded from torchvision when executing the main.py script as demonstrated in the training section. 
 ## Training
 To train TRUNK in the paper for a particular dataset, run this command:
 
 ```train
-$ python main.py --train --dataset emnist --model_backbone mobilenet 
+$ python main.py --train --dataset emnist --model_backbone mobilenet --grouping_volatility --debug
 ```
 The hyperparameters used to train TRUNK on the specific dataset are loaded into the training script from the hyperparameters.yaml file which is found in the Datasets/dataset name. 
 
@@ -27,7 +20,7 @@ The hyperparameters used to train TRUNK on the specific dataset are loaded into 
 To evaluate TRUNK on a particular dataset, run:
 
 ```eval
-$ python main.py --infer --dataset emnist --model_backbone mobilenet
+$ python main.py --infer --dataset emnist --model_backbone mobilenet --grouping_volatility 
 ```
 The hyperparameters used to conduct inference using TRUNK on the specific dataset are loaded into the test script from the hyperparameters.yaml file which is found in the Datasets/dataset name. 
 
@@ -41,11 +34,11 @@ $ python metrics.py --dataset emnist --model_backbone mobilenet --visualize --un
 ## Results
 TRUNK achieves the following performance on each of the datasets as shown below. The memory and G-FLOPs are measured on the shortest and longest branch of the tree.
 
-| Dataset Name       | Pre-Trained Weights                                                               | Inference Accuracy [%]| Inference Time per Image [s/Image]| Memory [MB]  | G-FLOPs    |
+| Dataset Name       | Pre-Trained Weights                                                               | Inference Accuracy [%]| Latency [ms]| Memory [MB]  | G-FLOPs    |
 | ------------------ |-----------------------------------------------------------------------------------| --------------------- |-----------------------------------| -----------  |------------|
-| EMNIST             | [EMNIST Pre-Trained Weights](Datasets/cifar10/mobilenet_81/model_weights/root.pt) |     80.88             | 49.63                             | 0.23 - 0.76  |0.04 - 0.37 |
-| CIFAR10            | [CIFAR10 Pre-Trained Weights](Datasets/emnist/mobilenet/model_weights/root.pt)    |     81.36             | 57.60                             | 1.25 - 17.74 |0.36 - 4.81 |
-| SVHN               | [SVHN Pre-Trained Weights](Datasets/svhn/mobilenet/model_weights/root.pt)         |     86.86             | 37.45                             | 0.23 - 0.76  |0.04 - 0.40 |
+| EMNIST             | [EMNIST Pre-Trained Weights](Datasets/emnist/mobilenet/1.2/model_weights/root.pt) |     84.30            | 102.50                             | 0.23 - 0.76  |0.04 - 0.37 |
+| CIFAR10            | [CIFAR10 Pre-Trained Weights](Datasets/cifar10/vgg_batchNorm/1.02/model_weights/root.pt)    |    67.61              | 13.1                           | 0.30 - 0.41 | 0.02 - 0.03 |
+| SVHN               | [SVHN Pre-Trained Weights](Datasets/svhn/mobilenet/0.7/model_weights/root.pt)         |    90.24             | 77.52                         | 0.23 - 0.76  |0.04 - 0.40 |
 
 [1]: https://arxiv.org/pdf/1801.04381.pdf
 [2]: https://arxiv.org/pdf/1409.1556.pdf 
