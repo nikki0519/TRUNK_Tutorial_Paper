@@ -81,11 +81,12 @@ def get_model(dataloader, current_supergroup):
     else:
         raise Exception("Please provide a valid dataset, i.e. emnist, cifar10, or svhn")
 
-    # checkpoint = torch.load(path_to_current_sg_weights)
-    # model.load_state_dict(checkpoint['model_state_dict'])
-
-    model.load_state_dict(torch.load(path_to_current_sg_weights)) # uncomment for batchNorm folder
+    checkpoint = torch.load(path_to_current_sg_weights)
+    model.load_state_dict(checkpoint['model_state_dict'])
     model = model.to(device)
+
+    # model.load_state_dict(torch.load(path_to_current_sg_weights)) # uncomment for batchNorm folder
+    # model = model.to(device)
     return model
 
 def test(testloader):
@@ -129,7 +130,7 @@ def test(testloader):
                 next_sg = torch.argmax(sg_prediction, dim=1).item()
                 path_taken.append(next_sg)
 
-                if(path_taken in list(leaf_nodes.values())):
+                if(path_taken in list(leaf_nodes.values()) or inverse_path_decisions == {(): "root"}): # check the second part on 0.6-0.63
                     # the path taken has led us down to a leaf node in the tree
                     target_map_integer = [x.item() for x in target_map if x.item() != -1] 
                     predicted_class = inverse_target_map[tuple(path_taken)]
