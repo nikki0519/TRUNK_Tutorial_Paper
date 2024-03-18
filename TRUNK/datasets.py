@@ -457,7 +457,6 @@ def load_dataset(dataset, config, train=False, validation=False):
 		else:
 			transform_config = config.dataset.train.transform
 	else:
-		print("Test Transforms")
 		transform_config = config.dataset.test.transform
 
 	transform = build_transforms(transform_config)
