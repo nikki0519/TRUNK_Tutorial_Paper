@@ -68,7 +68,7 @@ class GenerateDataset(torch.utils.data.Dataset):
 		get a dictionary of class IDs and their respective labels
 	"""
 
-	def __init__(self, dataset, model_backbone, config, grouping_volatility, train=False):
+	def __init__(self, dataset, model_backbone, config, grouping_volatility, train=False, validation=False):
 		"""
 		Parameters
 		----------
@@ -86,11 +86,14 @@ class GenerateDataset(torch.utils.data.Dataset):
 
 		train: bool
 			train is true, if we want to create a training dataset and train is false if we want to create a testing dataset
+
+		validation: bool
+			validation is true, if we want to create a validation dataset and train is false
 		"""
 
 		self.dataset = dataset 
 		self.model_backbone = model_backbone 
-		self.data = load_dataset(self.dataset, config, train)
+		self.data = load_dataset(self.dataset, config, train, validation)
 		self.max_depth = 1 
 		self.grouping_volatility = grouping_volatility
 
@@ -427,7 +430,7 @@ def build_transforms(transform_config):
 
 	return transforms.Compose(transform_list)
 
-def load_dataset(dataset, config, train=False):
+def load_dataset(dataset, config, train=False, validation=False):
 	"""
 	Return a torchvision dataset given user input of which dataset they want to conduct image classification for using TRUNK
 
@@ -448,32 +451,62 @@ def load_dataset(dataset, config, train=False):
 		the torchvision dataset that the user wants to train/test on using TRUNK
 	"""
 	
-	transform_config = config.dataset.train.transform
+	if(train):
+		if(validation):
+			transform_config = config.dataset.validation.transform
+		else:
+			transform_config = config.dataset.train.transform
+	else:
+		print("Test Transforms")
+		transform_config = config.dataset.test.transform
+
 	transform = build_transforms(transform_config)
 	# path_to_data = "../data"
 	path_to_data = "/scratch/gilbreth/ravi30/data"
 	
 	if(train):
-		if(dataset == "emnist"):
+		if(validation):
+			if(dataset == "emnist"):
 				return datasets.EMNIST(
-								root=f"{path_to_data}/train",
-								split="balanced",
-								train=True,
-								download=True,
-								transform=transform
-						)
-		
-		elif(dataset == "svhn"):
-				return datasets.SVHN(root=f"{path_to_data}/train/",
-								split="train",
-								download=True,
-								transform=transform)
-		
-		elif(dataset == "cifar10"):
-			return datasets.CIFAR10(root=f"{path_to_data}/train/", 
-									 train=True, 
-									 download=True, 
-									 transform=transform)
+							root=f"{path_to_data}/test/",
+							split="balanced",
+							train=False,
+							download=True,
+							transform=transform)
+
+			elif(dataset == "svhn"):
+				return datasets.SVHN(root=f"{path_to_data}/test/",
+									split="test",
+									download=True,
+									transform=transform)
+			
+			elif(dataset == "cifar10"):
+				return datasets.CIFAR10(root=f"{path_to_data}/test/", 
+										train=False, 
+										download=True, 
+										transform=transform)
+
+		else:
+			if(dataset == "emnist"):
+					return datasets.EMNIST(
+									root=f"{path_to_data}/train",
+									split="balanced",
+									train=True,
+									download=True,
+									transform=transform
+							)
+			
+			elif(dataset == "svhn"):
+					return datasets.SVHN(root=f"{path_to_data}/train/",
+									split="train",
+									download=True,
+									transform=transform)
+			
+			elif(dataset == "cifar10"):
+				return datasets.CIFAR10(root=f"{path_to_data}/train/", 
+										train=True, 
+										download=True, 
+										transform=transform)
 		 
 	else:
 		if(dataset == "emnist"):

@@ -236,8 +236,8 @@ def main():
             print(f"Current Grouping Volatility is {grouping_volatility}")
 
             # Download datasets
-            train_dataset = GenerateDataset(args.dataset.lower(), args.model_backbone.lower(), config, grouping_volatility, train=True)
-            test_dataset = GenerateDataset(args.dataset.lower(), args.model_backbone.lower(), config, grouping_volatility, train=False)
+            train_dataset = GenerateDataset(args.dataset.lower(), args.model_backbone.lower(), config, grouping_volatility, train=True, validation=False)
+            test_dataset = GenerateDataset(args.dataset.lower(), args.model_backbone.lower(), config, grouping_volatility, train=True, validation=True)
 
             # Dataset features
             class_labels = train_dataset.labels # List of unique classes in the dataset
@@ -362,7 +362,7 @@ def main():
             print(f"Current Grouping Volatility is {grouping_volatility}")
 
             # Download datasets
-            test_dataset = GenerateDataset(args.dataset.lower(), args.model_backbone.lower(), config, grouping_volatility, train=False)
+            test_dataset = GenerateDataset(args.dataset.lower(), args.model_backbone.lower(), config, grouping_volatility, train=False, validation=False)
             # Create dataloaders
             testloader = get_dataloader(test_dataset, config)
             
