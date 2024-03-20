@@ -310,8 +310,14 @@ def main():
                 else:
                     grouping_hyperparameters = config.general.grouping_hyperparameters
 
+                if(args.grouping_volatility):
+                    supergroup_grouping_volatility = grouping_hyperparameters.grouping_volatility
+                else:
+                    supergroup_grouping_volatility = grouping_volatility
+
+                print(f"For the current supergroup: {current_supergroup}, the grouping volatility we are using is: {supergroup_grouping_volatility}")
                 path_decisions = trainloader.dataset.get_path_decisions() # the paths down the tree from the root node to each node in the tree
-                list_of_new_supergroups = update_target_map(trainloader, current_supergroup, grouping_volatility, path_to_softmax_matrix, path_decisions[current_supergroup], debug=args.debug)
+                list_of_new_supergroups = update_target_map(trainloader, current_supergroup, supergroup_grouping_volatility, path_to_softmax_matrix, path_decisions[current_supergroup], debug=args.debug)
                 nodes_dict = trainloader.dataset.get_dictionary_of_nodes() # updated dictionary of nodes
 
                 # If there are new supergroups then add it to the end of the queue and update the dictionary_of_inputs_for_models
@@ -324,6 +330,11 @@ def main():
                 # Re-train the current supergroup to distinguish betweeen the number of children it has rather than the number of classes 
                 node = nodes_dict[current_supergroup]
                 num_children = node.num_groups 
+
+                if(nodes_dict["root"].num_groups != 3 and args.dataset.lower() == "cifar10"):
+                    print(f"The root node does not have 3 children")
+                    quit()
+
                 num_classes = len(node.classes) 
         
                 print(f"For the current supergroup: {current_supergroup}, they have {num_classes} labels and {num_children} children with an image shape of {dictionary_of_inputs_for_models[current_supergroup][0]}")
