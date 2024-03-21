@@ -144,7 +144,7 @@ def SigmoidMembership(number_of_classes, grouping_volatility, x):
 	sigmoidMembership: float
 		determine the visual simularity between two classes
 	"""
-
+	
 	return 1.0 / (1.0 + math.exp(-(x - (1.0 / number_of_classes * grouping_volatility)) / (1.0 / (10.0 * number_of_classes * grouping_volatility))))
 
 def create_supergroup_list_helper(number_of_classes, grouping_volatility, avg_softmax_matrix):
