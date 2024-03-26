@@ -2,7 +2,7 @@ seed: 29525
 dataset:
   train:
     params:
-      batch_size: 420
+      batch_size: 1024
       num_workers: 64
       shuffle: True
     transform:
@@ -26,7 +26,7 @@ dataset:
         - 0.2010
   validation:
     params:
-      batch_size: 420
+      batch_size: 1024
       num_workers: 64
       shuffle: True
     transform:
@@ -76,7 +76,7 @@ general:
   grouping_hyperparameters:
     loss: 
     - type: CrossEntropyLoss
-    grouping_volatility: 0.86
+    grouping_volatility: 0.96
     lr_scheduler: 
     - type: StepLR
       params:
@@ -102,11 +102,11 @@ sg5:
       params:
         lr: 0.01
         weight_decay: 0.0005
-    epochs: 30
+    epochs: 31
   grouping_hyperparameters:
     loss: 
     - type: CrossEntropyLoss
-    grouping_volatility: 0.79
+    grouping_volatility: 0.81
     lr_scheduler: 
     - type: StepLR
       params:
