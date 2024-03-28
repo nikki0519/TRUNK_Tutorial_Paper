@@ -49,32 +49,70 @@ class MNN(nn.Module):
 		layers = []
 		if(self.supergroup == "root"):
 			layers.append(nn.Conv2d(in_channels=input_channel, out_channels=16, kernel_size=3, padding=1))
-			layers.append(DynamicNormalization(batch_norm=batch_norm))
+			layers.append(nn.BatchNorm2d(num_features=16)) 
 			layers.append(nn.ReLU(inplace=True))
 			###
 			layers.append(nn.Conv2d(in_channels=16, out_channels=32, kernel_size=3, padding=1))
-			layers.append(DynamicNormalization(batch_norm=batch_norm))
+			layers.append(nn.BatchNorm2d(num_features=32)) 
 			layers.append(nn.ReLU(inplace=True))
 			###
 			layers.append(nn.Conv2d(in_channels=32, out_channels=32, kernel_size=3, padding=1))
-			layers.append(DynamicNormalization(batch_norm=batch_norm))
+			layers.append(nn.BatchNorm2d(num_features=32)) 
 			layers.append(nn.ReLU(inplace=True))
 			###
 			layers.append(nn.Conv2d(in_channels=32, out_channels=32, kernel_size=3, padding=1))
-			layers.append(DynamicNormalization(batch_norm=batch_norm))
+			layers.append(nn.BatchNorm2d(num_features=32)) 
 			layers.append(nn.ReLU(inplace=True))
 			###
 			layers.append(nn.MaxPool2d(kernel_size=2, stride=2))
 			###
 			layers.append(nn.Dropout2d(p=0.5))
+
+		# Comment lines 76 to 96 if the root node does not have three children
+		elif(self.supergroup == "sg1" or self.supergroup == "sg3"):
+			layers.append(nn.Conv2d(in_channels=input_channel, out_channels=64, kernel_size=3, padding=1))
+			layers.append(nn.BatchNorm2d(num_features=64))
+			layers.append(nn.ReLU(inplace=True))
+			###
+			layers.append(nn.Conv2d(in_channels=64, out_channels=32, kernel_size=3, padding=1))
+			layers.append(nn.BatchNorm2d(num_features=32))
+			layers.append(nn.ReLU(inplace=True))
+			###
+			layers.append(nn.Dropout2d(p=0.5))
+
+		elif(self.supergroup == "sg5"):
+			layers.append(nn.Conv2d(in_channels=input_channel, out_channels=32, kernel_size=3, padding=1))
+			layers.append(nn.BatchNorm2d(num_features=32))
+			layers.append(nn.ReLU(inplace=True))
+			###
+			layers.append(nn.Conv2d(in_channels=32, out_channels=32, kernel_size=3, padding=1))
+			layers.append(nn.BatchNorm2d(num_features=32))
+			layers.append(nn.ReLU(inplace=True))
+			###
+			layers.append(nn.Conv2d(in_channels=32, out_channels=64, kernel_size=3, padding=1))
+			layers.append(nn.BatchNorm2d(num_features=64))
+			layers.append(nn.ReLU(inplace=True))
+			###
+			layers.append(nn.Dropout2d(p=0.5))
+
+		# elif(self.supergroup == "sg6" or self.supergroup == "sg7"):
+		# 	layers.append(nn.Conv2d(in_channels=input_channel, out_channels=16, kernel_size=3, padding=1))
+		# 	layers.append(nn.BatchNorm2d(num_features=16))
+		# 	layers.append(nn.ReLU(inplace=True))
+		# 	###
+		# 	layers.append(nn.Conv2d(in_channels=16, out_channels=32, kernel_size=3, padding=1))
+		# 	layers.append(nn.BatchNorm2d(num_features=32))
+		# 	layers.append(nn.ReLU(inplace=True))
+		# 	###
+		# 	layers.append(nn.Dropout2d(p=0.5))
 			
 		else:
 			layers.append(nn.Conv2d(in_channels=input_channel, out_channels=16, kernel_size=3, padding=1))
-			layers.append(DynamicNormalization(batch_norm=batch_norm))
+			layers.append(nn.BatchNorm2d(num_features=16)) 
 			layers.append(nn.ReLU(inplace=True))
 			###
 			layers.append(nn.Conv2d(in_channels=16, out_channels=32, kernel_size=3, padding=1))
-			layers.append(DynamicNormalization(batch_norm=batch_norm))
+			layers.append(nn.BatchNorm2d(num_features=32)) 
 			layers.append(nn.ReLU(inplace=True))
 			###
 			layers.append(nn.Dropout2d(p=0.5))

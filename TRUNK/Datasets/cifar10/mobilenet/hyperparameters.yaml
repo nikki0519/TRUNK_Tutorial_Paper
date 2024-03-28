@@ -1,8 +1,8 @@
-seed: 42
+seed: 29525
 dataset:
   train:
     params:
-      batch_size: 32
+      batch_size: 128
       num_workers: 2
       shuffle: True
     transform:
@@ -12,82 +12,113 @@ dataset:
         - 32
         - 32
         padding: 4
-    - type: Resize
-      params:
-        size:
-        - 224
-        - 224
+    - type: RandomHorizontalFlip
     - type: ToTensor
     - type: Normalize
       params:
         mean:
-        - 0.500
-        - 0.500
-        - 0.500
+        - 0.4914
+        - 0.4822
+        - 0.4465
         std:
-        - 0.500
-        - 0.500
-        - 0.500
+        - 0.2023
+        - 0.1994
+        - 0.2010
   validation:
     params:
-      batch_size: 32
+      batch_size: 100
       num_workers: 2
       shuffle: True
     transform:
-    - type: RandomCrop
-      params:
-        size:
-        - 32
-        - 32
-        padding: 4
-    - type: Resize
-      params:
-        size:
-        - 224
-        - 224
     - type: ToTensor
     - type: Normalize
       params:
         mean:
-        - 0.500
-        - 0.500
-        - 0.500
+        - 0.4914
+        - 0.4822
+        - 0.4465
         std:
-        - 0.500
-        - 0.500
-        - 0.500
+        - 0.2023
+        - 0.1994
+        - 0.2010
   test:
     params:
       batch_size: 1
       num_workers: 2
       shuffle: True
+    transform:
+    - type: ToTensor
+    - type: Normalize
+      params:
+        mean:
+        - 0.4914
+        - 0.4822
+        - 0.4465
+        std:
+        - 0.2023
+        - 0.1994
+        - 0.2010
+root:
+  class_hyperparameters:
+    loss: 
+    - type: CrossEntropyLoss
+    lr_scheduler: 
+    - type: CosineAnnealingLR
+      params:
+        T_max: 200
+        eta_min: 0
+    optimizer: 
+    - type: SGD
+      params:
+        lr: 0.01
+        momentum: 0.9
+        weight_decay: 0.0005
+    epochs: 5
+  grouping_hyperparameters:
+    loss: 
+    - type: CrossEntropyLoss
+    grouping_volatility: 0.72
+    lr_scheduler: 
+    - type: CosineAnnealingLR
+      params:
+        T_max: 200
+        eta_min: 0
+    optimizer: 
+    - type: SGD
+      params:
+        lr: 0.01
+        momentum: 0.9
+        weight_decay: 0.0005
+    epochs: 10
 general:
   class_hyperparameters:
     loss: 
-    - type: NLLLoss
+    - type: CrossEntropyLoss
     lr_scheduler: 
     - type: CosineAnnealingLR
       params:
-        T_max: 10
+        T_max: 200
         eta_min: 0
     optimizer: 
-    - type: Adam
+    - type: SGD
       params:
-        lr: 0.001
+        lr: 0.01
+        momentum: 0.9
         weight_decay: 0.0005
-    epochs: 40
+    epochs: 30
   grouping_hyperparameters:
     loss: 
-    - type: NLLLoss
-    grouping_volatility: 0.70
+    - type: CrossEntropyLoss
+    grouping_volatility: 0.63
     lr_scheduler: 
     - type: CosineAnnealingLR
       params:
-        T_max: 10
+        T_max: 200
         eta_min: 0
     optimizer: 
-    - type: Adam
+    - type: SGD
       params:
-        lr: 0.0001
+        lr: 0.01
+        momentum: 0.9
         weight_decay: 0.0005
-    epochs: 40
+    epochs: 90
