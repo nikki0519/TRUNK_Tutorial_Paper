@@ -330,11 +330,6 @@ def main():
                 # Re-train the current supergroup to distinguish betweeen the number of children it has rather than the number of classes 
                 node = nodes_dict[current_supergroup]
                 num_children = node.num_groups 
-
-                if(nodes_dict["root"].num_groups != 3 and args.dataset.lower() == "cifar10"):
-                    print(f"The root node does not have 3 children")
-                    quit()
-
                 num_classes = len(node.classes) 
         
                 print(f"For the current supergroup: {current_supergroup}, they have {num_classes} labels and {num_children} children with an image shape of {dictionary_of_inputs_for_models[current_supergroup][0]}")
