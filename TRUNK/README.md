@@ -14,7 +14,7 @@ To train TRUNK in the paper for a particular dataset, run this command:
 ```train
 $ python main.py --train --dataset emnist --model_backbone mobilenet --grouping_volatility --debug
 ```
-The hyperparameters used to train TRUNK on the specific dataset are loaded into the training script from the hyperparameters.yaml file which is found in the Datasets/dataset name. 
+The hyperparameters used to train TRUNK on the specific dataset are loaded into the training script from the hyperparameters.yaml file which is found in the Datasets/dataset name/model backbone. 
 
 ## Evaluation
 To evaluate TRUNK on a particular dataset, run:
@@ -37,7 +37,7 @@ TRUNK achieves the following performance on each of the datasets as shown below.
 | Dataset Name       | Pre-Trained Weights                                                               | Inference Accuracy [%]| Latency [ms]| Memory [MB]  | G-FLOPs    |
 | ------------------ |-----------------------------------------------------------------------------------| --------------------- |-----------------------------------| -----------  |------------|
 | EMNIST             | [EMNIST Pre-Trained Weights](Datasets/emnist/mobilenet/1.2/model_weights/root.pt) |     84.30            | 102.50                             | 0.23 - 0.76  |0.04 - 0.37 |
-| CIFAR10            | [CIFAR10 Pre-Trained Weights](Datasets/cifar10/vgg_batchNorm/1.02/model_weights/root.pt)    |    67.61              | 13.1                           | 0.30 - 0.41 | 0.02 - 0.03 |
+| CIFAR10            | [CIFAR10 Pre-Trained Weights](Datasets/cifar10/vgg_batchAblation/BatchSize_512/model_weights/root.pt)    |    72.48              | 13.1                           | 0.30 - 0.41 | 0.02 - 0.03 |
 | SVHN               | [SVHN Pre-Trained Weights](Datasets/svhn/mobilenet/0.7/model_weights/root.pt)         |    90.24             | 77.52                         | 0.23 - 0.76  |0.04 - 0.40 |
 
 [1]: https://arxiv.org/pdf/1801.04381.pdf
