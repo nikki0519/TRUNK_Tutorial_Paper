@@ -1,0 +1,120 @@
+seed: 29525
+dataset:
+  train:
+    params:
+      batch_size: 2048
+      num_workers: 64
+      shuffle: True
+    transform:
+    - type: RandomCrop
+      params:
+        size:
+        - 32
+        - 32
+        padding: 4
+    - type: RandomHorizontalFlip
+    - type: ToTensor
+    - type: Normalize
+      params:
+        mean:
+        - 0.4914
+        - 0.4822
+        - 0.4465
+        std:
+        - 0.2023
+        - 0.1994
+        - 0.2010
+  validation:
+    params:
+      batch_size: 2048
+      num_workers: 64
+      shuffle: True
+    transform:
+    - type: ToTensor
+    - type: Normalize
+      params:
+        mean:
+        - 0.4914
+        - 0.4822
+        - 0.4465
+        std:
+        - 0.2023
+        - 0.1994
+        - 0.2010
+  test:
+    params:
+      batch_size: 1
+      num_workers: 1
+      shuffle: True
+    transform:
+    - type: ToTensor
+    - type: Normalize
+      params:
+        mean:
+        - 0.4914
+        - 0.4822
+        - 0.4465
+        std:
+        - 0.2023
+        - 0.1994
+        - 0.2010
+general:
+  class_hyperparameters:
+    loss: 
+    - type: CrossEntropyLoss
+    lr_scheduler: 
+    - type: StepLR
+      params:
+        step_size: 30
+        gamma: 0.1
+    optimizer: 
+    - type: Adam
+      params:
+        lr: 0.01
+        weight_decay: 0.0005
+    epochs: 90
+  grouping_hyperparameters:
+    loss: 
+    - type: CrossEntropyLoss
+    grouping_volatility: 0.92
+    lr_scheduler: 
+    - type: StepLR
+      params:
+        step_size: 30
+        gamma: 0.1
+    optimizer: 
+    - type: Adam
+      params:
+        lr: 0.001
+        weight_decay: 0.0005
+    epochs: 90
+sg5:
+  class_hyperparameters:
+    loss: 
+    - type: CrossEntropyLoss
+    lr_scheduler: 
+    - type: StepLR
+      params:
+        step_size: 30
+        gamma: 0.1
+    optimizer: 
+    - type: Adam
+      params:
+        lr: 0.01
+        weight_decay: 0.0005
+    epochs: 31
+  grouping_hyperparameters:
+    loss: 
+    - type: CrossEntropyLoss
+    grouping_volatility: 0.84
+    lr_scheduler: 
+    - type: StepLR
+      params:
+        step_size: 30
+        gamma: 0.1
+    optimizer: 
+    - type: Adam
+      params:
+        lr: 0.001
+        weight_decay: 0.0005
+    epochs: 90
