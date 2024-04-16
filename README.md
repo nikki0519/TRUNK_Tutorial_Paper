@@ -1,7 +1,18 @@
 # Reproducible Deep Learning Software for Efficient Computer Vision 
 PyTorch implementation and pre-trained models of TRUNK for the EMNIST, CiFAR10, and SVHN datasets. For details, see the papers: [Reproducible Deep Learning Software for Efficient Computer Vision](#Include Link).
 
-Despite effectively reducing the memory requirements, most low-powered computer vision techniques still retain their monolithic structures that rely on a single DNN to simultaneously classify all the categories, causing it to still conduct redundant operations. To address this issue, we introduce a tree-based unidirectional neural network (TRUNK) to eliminate redundancies for image classification. The TRUNK architecture reduces these redundant operations by using only a small subsets of the neurons in the DNN by using a tree-based approach. 
+Computer vision (CV) using deep learning can equip machines with the ability to understand visual information. CV has
+seen widespread adoption across numerous industries, from autonomous vehicles to facial recognition on smartphones.
+However, alongside these advancements, there have been increasing concerns about reproducing the results. The difficulty of
+reproducibility may arise due to multiple reasons, such as differences in execution environments, missing or incompatible
+software libraries, proprietary data, and the stochastic nature in some software. A study conducted by the Nature journal
+reveals that more than 70% of researchers failed to reproduce other researcher’s experiments; over 50% failed to reproduce
+their own experiments. Given the critical role that computer vision plays in many applications, especially in edge devices
+like mobile phones and drones, irreproducibility poses significant challenges for researchers and practitioners. To address
+these concerns, this paper presents a systematic approach at analyzing and improving the reproducibility of computer vision
+models through case studies. This approach combines rigorous documentation standards, standardized software environment,
+and a comprehensive guide of best practices. By implementing these strategies, we aim to bridge the gap between research
+and practice, ensuring that innovations in computer vision can be effectively reproduced and deployed.
 
 This github repository contains all the code used to generate the results mentioned or displayed in the aforementioned paper, divided into three directories:
 - LPCV Background: Contains the code used to introduce LPCV techniques mentioned in the background section of the paper
