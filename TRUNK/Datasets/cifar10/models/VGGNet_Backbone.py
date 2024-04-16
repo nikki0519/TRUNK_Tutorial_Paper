@@ -64,6 +64,7 @@ class MNN(nn.Module):
 			layers.append(nn.BatchNorm2d(num_features=32)) 
 			layers.append(nn.ReLU(inplace=True))
 			###
+			### Comment this block to
 			layers.append(nn.Conv2d(in_channels=32, out_channels=64, kernel_size=3, padding=1))
 			layers.append(nn.BatchNorm2d(num_features=64)) 
 			layers.append(nn.ReLU(inplace=True))
@@ -71,6 +72,7 @@ class MNN(nn.Module):
 			layers.append(nn.Conv2d(in_channels=64, out_channels=64, kernel_size=3, padding=1))
 			layers.append(nn.BatchNorm2d(num_features=64)) 
 			layers.append(nn.ReLU(inplace=True))
+			### This block while doing the ablation experiments
 			###
 			layers.append(nn.MaxPool2d(kernel_size=2, stride=2))
 			###
