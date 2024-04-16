@@ -83,7 +83,7 @@ root:
   grouping_hyperparameters:
     loss: 
     - type: CrossEntropyLoss
-    grouping_volatility: 0.95
+    grouping_volatility: 0.78
     lr_scheduler: 
     - type: StepLR
       params:
