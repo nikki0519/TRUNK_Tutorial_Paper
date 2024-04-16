@@ -5,7 +5,7 @@ Despite effectively reducing the memory requirements, most low-powered computer 
 
 The Datasets directory is further divided into the three folderes representing the three datasets (i.e. EMNSIT, CiFAR10, SVHN) we've used to train/test TRUNK. Within these folders, we have the models/ directory where the MobileNetv2 and VGG16 networks are saved. Within the mobilenet/ and vgg/ directories, the inputs and results (i.e. hyper-parameters, model weights, model softmax, details of the tree, and inference results) are stored. 
 
-The architecture design varies by the different datasets used and is inspired by the [MobileNetv2][1] and [VGG-16][2] networks. The pre-trained weights are available for the MobileNet inspired architecture. The networks for each dataset are found in Datasets/dataset name/models
+The architecture design varies by the different datasets used and is inspired by the [MobileNetv2][1] and [VGG-16][2] networks. The pre-trained weights for EMNIST and SVHN are available for the MobileNet inspired architecture. The pre-trained weights for CIFAR-10 are available for the VGG inspired network. The networks for each dataset are found in Datasets/dataset name/models
 
 The data (EMNIST, CiFAR10, and SVHN) used to train and test the TRUNK model will be downloaded from torchvision when executing the main.py script as demonstrated in the training section. 
 ## Training
