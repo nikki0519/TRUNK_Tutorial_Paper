@@ -37,7 +37,7 @@ TRUNK achieves the following performance on each of the datasets as shown below.
 | Dataset Name       | Pre-Trained Weights                                                               | Inference Accuracy [%]| Latency [ms]| Memory [MB]  | G-FLOPs    |
 | ------------------ |-----------------------------------------------------------------------------------| --------------------- |-----------------------------------| -----------  |------------|
 | EMNIST             | [EMNIST Pre-Trained Weights](Datasets/emnist/mobilenet/1.2/model_weights/root.pt) |     84.30            | 102.50                             | 0.23 - 0.76  |0.04 - 0.37 |
-| CIFAR10            | [CIFAR10 Pre-Trained Weights](Datasets/cifar10/vgg_batchAblation/BatchSize_512/model_weights/root.pt)    |    72.48              | 13.1                           | 0.30 - 0.41 | 0.02 - 0.03 |
+| CIFAR10            | [CIFAR10 Pre-Trained Weights](Datasets/cifar10/vgg/1.02/model_weights/root.pt)    |    78.18              | 21.50                           | 1.97 - 2.35 | 0.08 - 0.09 |
 | SVHN               | [SVHN Pre-Trained Weights](Datasets/svhn/mobilenet/0.7/model_weights/root.pt)         |    90.24             | 77.52                         | 0.23 - 0.76  |0.04 - 0.40 |
 
 [1]: https://arxiv.org/pdf/1801.04381.pdf
