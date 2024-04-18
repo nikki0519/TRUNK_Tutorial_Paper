@@ -8,8 +8,6 @@
 # Import necessary libraries
 from torchvision import datasets
 from torchvision import transforms
-import albumentations
-from PIL import Image
 import numpy as np
 import torch
 import json
@@ -408,6 +406,47 @@ class GenerateDataset(torch.utils.data.Dataset):
 		self.target_map = self.get_target_map()
 		image, target = self.data[idx][0], self.target_map[str(self.data[idx][1])] # Note: self.data[idx] = (image, classID)
 		return image, target
+	
+class Cutout(object):
+	# Obtained from: https://github.com/uoguelph-mlrg/Cutout/tree/master
+    """Randomly mask out one or more patches from an image.
+
+    Args:
+        n_holes (int): Number of patches to cut out of each image.
+        length (int): The length (in pixels) of each square patch.
+    """
+    def __init__(self, n_holes, length):
+        self.n_holes = n_holes
+        self.length = length
+
+    def __call__(self, img):
+        """
+        Args:
+            img (Tensor): Tensor image of size (C, H, W).
+        Returns:
+            Tensor: Image with n_holes of dimension length x length cut out of it.
+        """
+        h = img.size(1)
+        w = img.size(2)
+
+        mask = np.ones((h, w), np.float32)
+
+        for n in range(self.n_holes):
+            y = np.random.randint(h)
+            x = np.random.randint(w)
+
+            y1 = np.clip(y - self.length // 2, 0, h)
+            y2 = np.clip(y + self.length // 2, 0, h)
+            x1 = np.clip(x - self.length // 2, 0, w)
+            x2 = np.clip(x + self.length // 2, 0, w)
+
+            mask[y1: y2, x1: x2] = 0.
+
+        mask = torch.from_numpy(mask)
+        mask = mask.expand_as(img)
+        img = img * mask
+
+        return img
 
 def build_transforms(transform_config):
 	"""
@@ -427,55 +466,16 @@ def build_transforms(transform_config):
 	"""
 
 	transform_list = []
-	albumentations_list = []
-
 	for item in transform_config:
 		transform_type = item['type']
 		params = item.get('params', {})
-		if(transform_type == "CoarseDropout"):
-			albumentations_class = getattr(albumentations, transform_type)
-			albumentations_list.append(albumentations_class(**params))
+		if(transform_type == "CutOut"):
+			transform_list.append(Cutout(**params))
 		else:
 			transform_class = getattr(transforms, transform_type)
 			transform_list.append(transform_class(**params))
 
-	torchvision_transforms = transforms.Compose(transform_list)
-	if(albumentations_list):
-		albumentation_transforms = albumentations.Compose(albumentations_list)
-	else:
-		albumentation_transforms = None
-	return torchvision_transforms, albumentation_transforms
-
-def combined_transform(image, albumentation_transform, torchvision_transform):
-	"""
-	Combine the transformations provided by torchvision and albumentations
-
-	Parameters
-	----------
-	torchvision_transforms: transforms.Compose
-		list of transformations from torchvision
-	albumentation_transforms: albumentations.Compose
-		list of transformations from albumentations.ai
-	
-	Return
-	------
-	image_tensor: torch.Tensor
-		transformed image
-	"""
-
-	if(albumentation_transform):
-		# Convert PIL image to NumPy array for Albumentations
-		image_np = np.array(image)
-		
-		# Apply Albumentation Transformation
-		transformed = albumentation_transform(image=image_np)
-		image_np = transformed["image"]
-
-		# Convert NumPy array back to PIL Image for torchvision
-		image = Image.fromarray(image_np.astype('uint8'), 'RGB')
-	
-	image_tensor = torchvision_transform(image)
-	return image_tensor
+	return transforms.Compose(transform_list)
 
 def load_dataset(dataset, config, train=False, validation=False):
 	"""
@@ -506,7 +506,7 @@ def load_dataset(dataset, config, train=False, validation=False):
 	else:
 		transform_config = config.dataset.test.transform
 
-	torchvision_transforms, albumentation_transforms = build_transforms(transform_config)
+	transform = build_transforms(transform_config)
 	# path_to_data = "../data/"
 	path_to_data = "/scratch/gilbreth/ravi30/data"
 	
@@ -518,19 +518,19 @@ def load_dataset(dataset, config, train=False, validation=False):
 							split="balanced",
 							train=False,
 							download=True,
-							transform=torchvision_transforms)
+							transform=transform)
 
 			elif(dataset == "svhn"):
 				return datasets.SVHN(root=f"{path_to_data}/test/",
 									split="test",
 									download=True,
-									transform=lambda x: combined_transform(x, albumentation_transforms, torchvision_transforms))
+									transform=transform)
 			
 			elif(dataset == "cifar10"):
 				return datasets.CIFAR10(root=f"{path_to_data}/test/", 
 										train=False, 
 										download=True, 
-										transform=lambda x: combined_transform(x, albumentation_transforms, torchvision_transforms))
+										transform=transform)
 
 		else:
 			if(dataset == "emnist"):
@@ -539,20 +539,20 @@ def load_dataset(dataset, config, train=False, validation=False):
 									split="balanced",
 									train=True,
 									download=True,
-									transform=torchvision_transforms
+									transform=transform
 							)
 			
 			elif(dataset == "svhn"):
 					return datasets.SVHN(root=f"{path_to_data}/train/",
 									split="train",
 									download=True,
-									transform=lambda x: combined_transform(x, albumentation_transforms, torchvision_transforms))
+									transform=transform)
 			
 			elif(dataset == "cifar10"):
 				return datasets.CIFAR10(root=f"{path_to_data}/train/", 
 										train=True, 
 										download=True, 
-										transform=lambda x: combined_transform(x, albumentation_transforms, torchvision_transforms))
+										transform=transform)
 		 
 	else:
 		if(dataset == "emnist"):
@@ -561,19 +561,19 @@ def load_dataset(dataset, config, train=False, validation=False):
 							split="balanced",
 							train=False,
 							download=True,
-							transform=torchvision_transforms)
+							transform=transform)
 
 		elif(dataset == "svhn"):
 			return datasets.SVHN(root=f"{path_to_data}/test/",
 								split="test",
 								download=True,
-								transform=lambda x: combined_transform(x, albumentation_transforms, torchvision_transforms))
+								transform=transform)
 		
 		elif(dataset == "cifar10"):
 			return datasets.CIFAR10(root=f"{path_to_data}/test/", 
 									train=False, 
 									download=True, 
-									transform=lambda x: combined_transform(x, albumentation_transforms, torchvision_transforms))
+									transform=transform)
 
 def get_dataloader(dataset, config, train=False, validation=False):
 	"""
