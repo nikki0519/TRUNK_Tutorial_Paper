@@ -11,3 +11,4 @@ thop
 graphviz
 scipy
 torch-pruning
+albumentations

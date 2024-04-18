@@ -19,5 +19,6 @@ dependencies:
     - torchvision
     - tqdm
     - torch-pruning
+    - albumentations
     - git+https://github.com/Lyken17/pytorch-OpCounter.git
     - git+https://github.com/xflr6/graphviz.git
