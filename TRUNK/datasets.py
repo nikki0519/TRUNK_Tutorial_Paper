@@ -507,8 +507,7 @@ def load_dataset(dataset, config, train=False, validation=False):
 		transform_config = config.dataset.test.transform
 
 	transform = build_transforms(transform_config)
-	# path_to_data = "../data/"
-	path_to_data = "/scratch/gilbreth/ravi30/data"
+	path_to_data = "../data/"
 	
 	if(train):
 		if(validation):
