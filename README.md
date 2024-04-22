@@ -16,8 +16,8 @@ and practice, ensuring that innovations in computer vision can be effectively re
 
 This github repository contains all the code used to generate the results mentioned or displayed in the aforementioned paper, divided into three directories:
 - LPCV Background: Contains the code used to introduce LPCV techniques mentioned in the background section of the paper
-- Monolithic Architectures: Contains the code used to compare our TRUNK architecture against well-known monolithic architectures such as ConvNeXt, DinoV2, MobileNetv2, ResNet, ResNet Quantized, VGG Pruned, VGG, and ViT
-- TRUNK: Contains the code for training and testing our TRUNK, as well as the pre-trained models
+- Monolithic Architectures: Contains the code used to compare the TRUNK architecture against well-known monolithic architectures such as ConvNeXt, DinoV2, MobileNetv2, ResNet, ResNet Quantized, VGG Pruned, VGG, and ViT
+- TRUNK: Contains the code for training and testing the TRUNK network, as well as the pre-trained models
 
 ## Installation
 The implementations provided in this repository requires a python version 3.9.18, a PyTorch version 2.1 with CUDA 11.8, and other 3rd party packages. To setup the required dependencies to reproduce the results of this repository, follow these instructions
