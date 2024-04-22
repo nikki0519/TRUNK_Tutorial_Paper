@@ -1,5 +1,5 @@
 # ModelComparisons
-PyTorch code provided to conduct experiments and compare our TRUNK architecture on metrics such as validation accuracy, inference runtime per image, memory requirements, number of floating point operations (FLOPs), and the number of trainable parameters, to well-known monolithic architectures:
+PyTorch code provided to conduct experiments and compare the TRUNK architecture on metrics such as validation accuracy, inference runtime per image, memory requirements, number of floating point operations (FLOPs), and the number of trainable parameters, to well-known monolithic architectures:
 1. [VGG-16][1]
 2. [ResNet-50][2]
 3. ResNet-50 Quantize Aware Training (QAT)
