@@ -100,6 +100,16 @@ class MNN(nn.Module):
 			layers.append(nn.BatchNorm2d(num_features=64))
 			layers.append(nn.ReLU(inplace=True))
 			###
+			# Comment this part
+			layers.append(nn.Conv2d(in_channels=64, out_channels=128, kernel_size=3, padding=1))
+			layers.append(nn.BatchNorm2d(num_features=128))
+			layers.append(nn.ReLU(inplace=True))
+			###
+			layers.append(nn.Conv2d(in_channels=128, out_channels=128, kernel_size=3, stride=2, padding=1))
+			layers.append(nn.BatchNorm2d(num_features=128))
+			layers.append(nn.ReLU(inplace=True))
+			# To this part
+			###
 			layers.append(nn.Dropout2d(p=0.5))
 			
 		else:
@@ -109,6 +119,22 @@ class MNN(nn.Module):
 			###
 			layers.append(nn.Conv2d(in_channels=16, out_channels=32, kernel_size=3, padding=1))
 			layers.append(nn.BatchNorm2d(num_features=32)) 
+			layers.append(nn.ReLU(inplace=True))
+			###
+			layers.append(nn.Conv2d(in_channels=32, out_channels=32, kernel_size=3, padding=1))
+			layers.append(nn.BatchNorm2d(num_features=32)) 
+			layers.append(nn.ReLU(inplace=True))
+			###
+			layers.append(nn.Conv2d(in_channels=32, out_channels=64, kernel_size=3, padding=1))
+			layers.append(nn.BatchNorm2d(num_features=64)) 
+			layers.append(nn.ReLU(inplace=True))
+			###
+			layers.append(nn.Conv2d(in_channels=64, out_channels=64, kernel_size=3, stride=2, padding=1))
+			layers.append(nn.BatchNorm2d(num_features=64)) 
+			layers.append(nn.ReLU(inplace=True))
+			###
+			layers.append(nn.Conv2d(in_channels=64, out_channels=128, kernel_size=3, stride=2, padding=1))
+			layers.append(nn.BatchNorm2d(num_features=128)) 
 			layers.append(nn.ReLU(inplace=True))
 			###
 			layers.append(nn.Dropout2d(p=0.5))
