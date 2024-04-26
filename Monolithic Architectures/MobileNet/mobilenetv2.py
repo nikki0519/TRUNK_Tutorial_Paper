@@ -20,6 +20,30 @@ device = torch.device(device)
 
 loss_function = nn.CrossEntropyLoss() # loss function to compare target with prediction
 
+def load_checkpoint(model, optimizer, checkpoint_path):
+    """
+    Load the model checkpoint which is saved at every epoch
+
+    Parameters
+    ----------
+    model: torchvision.models
+        the chosen model by the user
+
+    optimizer: torch.optim
+        propagation function
+
+    checkpoint_path: str
+        path to model checkpoints
+    """
+
+    checkpoint = torch.load(checkpoint_path)
+    model.load_state_dict(checkpoint['model_state_dict'])
+    optimizer.load_state_dict(checkpoint['optimizer_state_dict'])
+
+    start_epoch = checkpoint['epoch'] + 1  # Resume from the next epoch
+    loss_per_iteration = checkpoint.get('loss_per_iteration', [])  # Get previous loss history if available
+    return start_epoch, loss_per_iteration
+
 @run_time
 def train(model, trainloader, epochs, learning_rate, betas, weight_decay, save_to_path=None):
     """
@@ -51,12 +75,16 @@ def train(model, trainloader, epochs, learning_rate, betas, weight_decay, save_t
         list of training loss over all the epochs and batches
     """
 
+    optimizer = torch.optim.Adam(model.parameters(), lr=learning_rate, betas=betas, weight_decay=weight_decay)
     model = model.to(device)
     model.train()
-    optimizer = torch.optim.Adam(model.parameters(), lr=learning_rate, betas=betas, weight_decay=weight_decay)
     loss_per_iteration = []
+    start_epoch = 1  # Default start epoch
 
-    for epoch in range(1, epochs + 1):
+    if(os.path.exists(save_to_path)):
+        start_epoch, loss_per_iteration = load_checkpoint(model, optimizer, save_to_path)
+
+    for epoch in range(start_epoch, epochs + 1):
         running_loss = 0.0
         for batch_idx, (inputs, targets) in enumerate(trainloader):
             inputs = inputs.to(device)
@@ -72,8 +100,14 @@ def train(model, trainloader, epochs, learning_rate, betas, weight_decay, save_t
                 loss_per_iteration.append(running_loss / 100)
                 running_loss = 0.0
 
-    if(save_to_path):
-        torch.save(model.state_dict(), save_to_path)
+        if(save_to_path):
+            # Also save the optimizer state and current epoch for resuming training
+            torch.save({
+                'epoch': epoch,
+                'model_state_dict': model.state_dict(),
+                'optimizer_state_dict': optimizer.state_dict(),
+                'loss_per_iteration': loss_per_iteration,
+            }, save_to_path)
 
     return loss_per_iteration
 
@@ -105,7 +139,8 @@ def test(model, path_to_network, testloader, num_classes):
         the accuracy of the model
     """
 
-    model.load_state_dict(torch.load(path_to_network))
+    checkpoint = torch.load(path_to_network)
+    model.load_state_dict(checkpoint['model_state_dict'])
     model = model.to(device)
     model.eval()
     confusion_matrix = np.zeros((num_classes, num_classes))
@@ -205,7 +240,8 @@ def mobilenet(trainloader, testloader, dataset):
         the dataset chosen by the user 
     """
 
-    path_to_model_weights = f"MobileNet/mobilenet_weights_{dataset}.pt"
+    gpu = "V100"
+    path_to_model_weights = f"MobileNet/{gpu}s/mobilenet_weights_{dataset}.pt"
     image_size = (1,) + tuple(trainloader.dataset[0][0].shape)
     if(dataset == "svhn"):
         class_list = list(set(testloader.dataset.labels))
