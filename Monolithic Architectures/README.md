@@ -44,7 +44,7 @@ The results for each dataset are as follows:
 | MobileNetv2   |  [MobileNetv2 Pre-Trained Weights](MobileNet/mobilenet_weights_cifar10.pt) | 84.54  | 4.79 | 9.19 | 0.33 |
 | ViT   |  [ViT Pre-Trained Weights](ViT/vit_weights_cifar10.pt) |  90.55  | 6.47 | 343.28 | 11.29 |
 | DinoV2   |  [DinoV2 Pre-Trained Weights](DinoV2/dinov2_weights_cifar10.pt) |  85.64  | 12.16 | 346.40 | 22.30 |
-| DinoV2   |  [DeIT Pre-Trained Weights](DeIT/deit_weights_cifar10.pt) |  89.48  | 4.38 | 22.17 | 1.06 |
+| DeIT   |  [DeIT Pre-Trained Weights](DeIT/deit_weights_cifar10.pt) |  89.48  | 4.38 | 22.17 | 1.06 |
 
 ### SVHN
 | Model name         | Pre-Trained Weights  | Inference Accuracy [%] | Inference Time per Image [s/Image] | Memory [MB] | G-Flops |
@@ -57,7 +57,7 @@ The results for each dataset are as follows:
 | MobileNetv2   |  [MobileNetv2 Pre-Trained Weights](MobileNet/mobilenet_weights_svhn.pt) | 95.69  | 4.62 | 9.19 | 0.33 |
 | ViT   |  [ViT Pre-Trained Weights](ViT/vit_weights_svhn.pt) |  95.87  | 6.32 | 343.28 | 11.29 |
 | DinoV2   |  [DinoV2 Pre-Trained Weights](DinoV2/dinov2_weights_svhn.pt) |  94.32  | 11.96 | 345.19 | 22.23 |
-| DinoV2   |  [DeIT Pre-Trained Weights](DeIT/deit_weights_svhn.pt) |  95.19  | 4.44 | 22.16 | 1.08 |
+| DeIT   |  [DeIT Pre-Trained Weights](DeIT/deit_weights_svhn.pt) |  95.19  | 4.44 | 22.16 | 1.08 |
 
 [1]: https://arxiv.org/pdf/1409.1556.pdf
 [2]: https://arxiv.org/pdf/1512.03385.pdf
