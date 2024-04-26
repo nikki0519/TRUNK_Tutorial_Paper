@@ -82,11 +82,11 @@ def get_model(dataloader, current_supergroup):
         raise Exception("Please provide a valid dataset, i.e. emnist, cifar10, or svhn")
 
     if(dataset.lower() == "cifar10"):
-        checkpoint = torch.load(path_to_current_sg_weights)
+        checkpoint = torch.load(path_to_current_sg_weights, map_location=device)
         model.load_state_dict(checkpoint['model_state_dict'])
         model = model.to(device)
     else:
-        model.load_state_dict(torch.load(path_to_current_sg_weights))
+        model.load_state_dict(torch.load(path_to_current_sg_weights, map_location=device))
         model = model.to(device)
 
     return model
