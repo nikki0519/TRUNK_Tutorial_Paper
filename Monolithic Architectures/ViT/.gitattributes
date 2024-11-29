@@ -1,1 +1,0 @@
-vit_weights_* filter=lfs diff=lfs merge=lfs -text
